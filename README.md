@@ -1,4 +1,4 @@
-# MiniERP v12 — README
+# MiniERP v1 — README
 
 **Offline Single-File Production ERP for Plastic Molding / Press Shop**
 
