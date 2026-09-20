@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniERP v12 — Created by Mayur</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:#eef2f8;color:#0f172a;padding:14px 18px 30px;line-height:1.4}
+.app{max-width:1700px;margin:0 auto}
+.header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;background:#fff;border-radius:18px;padding:14px 20px;box-shadow:0 8px 20px rgba(0,0,0,.04);margin-bottom:14px}
+.logo{font-weight:700;font-size:1.4rem;color:#0f3b7a;display:flex;align-items:center;gap:6px}
+.logo span{background:#0f3b7a;color:#fff;font-size:.7rem;padding:2px 9px;border-radius:999px;font-weight:500}
+.plant-selector{display:flex;align-items:center;gap:6px;background:#f8fafc;padding:4px 10px;border-radius:10px;border:1px solid #dbe3ef}
+.plant-selector select{background:transparent;border:none;font-weight:500;color:#0f3b7a;font-size:.9rem;outline:none;cursor:pointer}
+.command-bar{flex:1;min-width:200px}
+.command-bar input{width:100%;padding:9px 14px;border-radius:12px;border:1px solid #dbe3ef;background:#f9fbfe;font-size:.9rem;outline:none}
+.command-bar input:focus{border-color:#0f3b7a;background:#fff;box-shadow:0 0 0 3px rgba(15,59,122,.1)}
+.user-chip{display:flex;align-items:center;gap:6px;background:#f1f5f9;padding:4px 10px 4px 8px;border-radius:999px;font-size:.85rem;font-weight:500}
+.user-chip .role{background:#0f3b7a;color:#fff;font-size:.65rem;padding:2px 8px;border-radius:999px;font-weight:600}
+.badge-mayur{background:#0f3b7a;color:#fff;font-size:.75rem;padding:6px 14px;border-radius:999px;font-weight:500;white-space:nowrap}
+.history-btns{display:flex;gap:5px}
+.history-btns button{background:#f1f5f9;border:none;border-radius:9px;padding:7px 11px;font-size:.8rem;font-weight:500;color:#1e293b;cursor:pointer}
+.history-btns button:hover{background:#e2e8f0}
+.history-btns button:disabled{opacity:.4;cursor:not-allowed}
+.history-btns .clear-btn{color:#b91c1c;background:#fee2e2}
+.tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:6px;margin-bottom:12px}
+.tabs::-webkit-scrollbar{height:5px}.tabs::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+.tab{flex:0 0 auto;padding:7px 13px;background:#fff;border-radius:999px;font-size:.8rem;font-weight:500;color:#334155;cursor:pointer;border:1px solid #dbe3ef;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all .1s}
+.tab .nav-code{font-size:.65rem;background:#eef2f8;padding:2px 5px;border-radius:5px;color:#64748b;font-weight:600}
+.tab.active{background:#0f3b7a;color:#fff;border-color:#0f3b7a}
+.tab.active .nav-code{background:rgba(255,255,255,.2);color:#fff}
+.tab:hover:not(.active){background:#f8fafc;border-color:#b0c4de}
+.panel{background:#fff;border-radius:18px;padding:22px 26px;box-shadow:0 8px 20px rgba(0,0,0,.04);min-height:500px}
+h2{font-size:1.35rem;font-weight:600;color:#0f3b7a;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+h2 .code-badge{background:#eef2f8;color:#0f3b7a;font-size:.65rem;padding:4px 9px;border-radius:999px;font-weight:600}
+h3{font-size:1rem;font-weight:600;color:#1e293b;margin:16px 0 8px}
+h4{font-size:.9rem;font-weight:600;color:#1e293b;margin:12px 0 6px}
+.section-desc{color:#64748b;font-size:.85rem;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px}
+th{text-align:left;padding:8px 8px;background:#f8fafc;font-weight:600;color:#1e293b;border-bottom:2px solid #e2e8f0;white-space:nowrap;font-size:.78rem}
+td{padding:5px 8px;border-bottom:1px solid #eef2f8;vertical-align:middle}
+tr:hover td{background:#fafcff}
+td input,td select{width:100%;padding:4px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:.8rem;font-family:inherit;background:#fff;outline:none;min-width:50px}
+td input:focus,td select:focus{border-color:#0f3b7a;box-shadow:0 0 0 2px rgba(15,59,122,.1)}
+td input[type=number]{text-align:right;font-family:'SF Mono','Cascadia Code',monospace}
+.num{font-family:'SF Mono','Cascadia Code',monospace;font-size:.82rem}
+.badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.68rem;font-weight:600;white-space:nowrap}
+.badge-ok{background:#dcfce7;color:#16a34a}
+.badge-partial{background:#fef3c7;color:#d97706}
+.badge-block{background:#fee2e2;color:#dc2626}
+.badge-hold{background:#fee2e2;color:#dc2626}
+.badge-impossible{background:#fecaca;color:#7f1d1d}
+.badge-warning{background:#fef3c7;color:#b45309}
+.badge-info{background:#dbeafe;color:#1d4ed8}
+.badge-draft{background:#e2e8f0;color:#475569}
+.badge-released{background:#dbeafe;color:#1e40af}
+.badge-completed{background:#dcfce7;color:#15803d}
+.badge-cancelled{background:#fee2e2;color:#b91c1c}
+.badge-sunday{background:#f1f5f9;color:#475569}
+.badge-working{background:#dcfce7;color:#16a34a}
+.btn{border:none;border-radius:10px;padding:7px 14px;font-size:.82rem;font-weight:500;cursor:pointer;background:#f1f5f9;color:#1e293b;transition:all .1s;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:#e2e8f0}
+.btn-primary{background:#0f3b7a;color:#fff}.btn-primary:hover{background:#0a2d5e}
+.btn-danger{background:#fee2e2;color:#b91c1c}.btn-danger:hover{background:#fecaca}
+.btn-sm{padding:3px 8px;font-size:.72rem;border-radius:7px}
+.btn-group{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;align-items:center}
+.footer{text-align:center;margin-top:20px;color:#94a3b8;font-size:.75rem;padding:14px 0;border-top:1px solid #e2e8f0}
+.flex-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mb-8{margin-bottom:8px}
+.text-muted{color:#64748b;font-size:.82rem}
+.hidden{display:none!important}
+.kpi-tile{background:#f8fafc;border-radius:14px;padding:14px 18px;border:1px solid #e2e8f0;min-width:140px;flex:1}
+.kpi-tile h4{font-size:.72rem;color:#64748b;margin:0 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.kpi-tile .val{font-size:1.8rem;font-weight:700;color:#0f3b7a;font-family:'SF Mono','Cascadia Code',monospace}
+.schedule-grid{overflow-x:auto;margin-top:10px;border-radius:12px;border:1px solid #e2e8f0;background:#fff}
+.schedule-grid table{margin:0;border-collapse:collapse;width:100%;min-width:900px;font-size:.7rem}
+.schedule-grid th,.schedule-grid td{padding:5px 6px;border:1px solid #e2e8f0;text-align:center;vertical-align:top}
+.schedule-grid th{background:#f8fafc;font-weight:600;font-size:.7rem}
+.schedule-grid .machine-label{font-weight:600;text-align:left;background:#f8fafc;white-space:nowrap;font-size:.72rem}
+.schedule-grid th.sunday-col{background:#fef3c7;color:#b45309}
+.schedule-grid td.sunday-cell{background:#fffbeb}
+.shift-block{display:block;font-size:.6rem;padding:2px 3px;border-radius:4px;margin:1px 0;line-height:1.25}
+.shift-block.loading{background:#fde68a;color:#78350f}
+.shift-block.molding-primary{background:#bfdbfe;color:#1e3a8a}
+.shift-block.molding-alt{background:#ddd6fe;color:#4c1d95}
+.shift-block.locked{background:#bbf7d0;color:#14532d}
+.shift-block.breakdown{background:repeating-linear-gradient(45deg,#fecaca,#fecaca 4px,#fee2e2 4px,#fee2e2 8px);color:#7f1d1d}
+.shift-block.off-sunday{background:repeating-linear-gradient(45deg,#e2e8f0,#e2e8f0 4px,#f1f5f9 4px,#f1f5f9 8px);color:#64748b}
+.shift-block.working-sunday{background:#dcfce7;color:#16a34a;font-weight:600}
+.shift-block.held{background:repeating-linear-gradient(45deg,#fecaca,#fecaca 4px,#fee2e2 4px,#fee2e2 8px);color:#7f1d1d;font-style:italic}
+.chart-container{background:#fafcff;border-radius:14px;padding:14px;border:1px solid #eef2f8;margin:10px 0;overflow-x:auto}
+.chart-container svg{display:block;max-width:100%;height:auto}
+.heatmap-cell{display:inline-block;width:26px;height:26px;border-radius:5px;margin:2px;font-size:.6rem;text-align:center;line-height:26px;color:#1e293b;font-weight:500}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-box{background:#fff;border-radius:18px;padding:24px 28px;max-width:750px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+.modal-close{float:right;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b}
+.lab-container{display:flex;gap:16px;flex-wrap:wrap}
+.lab-left{flex:0 0 200px;background:#f8fafc;border-radius:14px;padding:14px;border:1px solid #e2e8f0}
+.lab-right{flex:1;min-width:400px;overflow-x:auto}
+.part-chip{background:#fff;border:1px solid #dbe3ef;border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:.8rem;font-weight:500;cursor:grab;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.part-chip:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.part-chip.dragging{opacity:.5;transform:scale(.98)}
+.part-chip.placed{opacity:.4;cursor:not-allowed;background:#f1f5f9}
+.lab-grid-wrap{display:grid;gap:3px;font-size:.7rem;min-width:800px}
+.lab-cell{background:#fff;border:1px solid #eef2f8;border-radius:5px;padding:4px 2px;min-height:44px;text-align:center;font-size:.6rem;position:relative;transition:all .1s}
+.lab-cell.droppable{background:#f0fdf4;border-color:#bbf7d0}
+.lab-cell.droppable.dragover{background:#dcfce7;border-color:#16a34a;box-shadow:inset 0 0 0 2px #16a34a}
+.lab-cell.invalid{background:#fef2f2;border-color:#fecaca}
+.lab-cell.sunday-off{background:repeating-linear-gradient(45deg,#e2e8f0,#e2e8f0 4px,#f1f5f9 4px,#f1f5f9 8px);cursor:not-allowed}
+.lab-cell.sunday-working{background:#f0fdf4;border-color:#86efac}
+.lab-header{font-weight:600;font-size:.7rem;padding:4px 2px;background:#f8fafc;border-radius:5px;text-align:center}
+.lab-header.sunday-header{background:#fef3c7;color:#b45309}
+.lab-header .dow{font-size:.6rem;color:#64748b;font-weight:400}
+.lab-header.sunday-header .dow{color:#b45309}
+.lab-placement{background:#bfdbfe;color:#1e3a8a;padding:2px 3px;border-radius:3px;font-size:.55rem;margin:1px 0;cursor:pointer}
+.lab-placement.locked{background:#bbf7d0;color:#14532d}
+.org-card{background:#f8fafc;border-radius:12px;padding:12px 16px;border:1px solid #e2e8f0;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.flow-tree{font-family:'SF Mono','Cascadia Code',monospace;font-size:.82rem;line-height:1.8;background:#fafcff;padding:14px 18px;border-radius:12px;border:1px solid #eef2f8;overflow-x:auto;white-space:pre-wrap}
+.flow-node{cursor:pointer;padding:2px 6px;border-radius:6px;background:#eef2f8;transition:background .1s}
+.flow-node:hover{background:#dbe3ef}
+.drag-ghost{position:fixed;pointer-events:none;background:#0f3b7a;color:#fff;padding:4px 10px;border-radius:8px;font-size:.75rem;z-index:9999;opacity:.9}
+.sunday-toggle{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;align-items:center}
+.sunday-toggle label{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:500;color:#78350f;cursor:pointer;padding:4px 10px;background:#fff;border-radius:8px;border:1px solid #fde68a}
+.sunday-toggle label:hover{background:#fef3c7}
+.sunday-toggle label.checked{background:#dcfce7;border-color:#16a34a;color:#14532d}
+.sunday-toggle input{width:auto;margin:0}
+@media(max-width:900px){.header{flex-direction:column;align-items:stretch}.command-bar{min-width:100%}.panel{padding:14px}.lab-left{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="header">
+<div class="logo">MiniERP <span>v12</span></div>
+<div class="plant-selector">
+<label style="font-size:.75rem;color:#64748b">Plant</label>
+<select id="plantSelect"></select>
+</div>
+<div class="command-bar">
+<input type="text" id="commandInput" placeholder="Type OBK, MOP-2026-0001, or 'create MOP'" autocomplete="off">
+</div>
+<div class="user-chip">
+<select id="userSelect" style="background:transparent;border:none;font-weight:500;font-size:.85rem;outline:none;cursor:pointer">
+<option value="Mayur">Mayur</option>
+<option value="Planner">Planner</option>
+<option value="Supervisor">Supervisor</option>
+<option value="Viewer">Viewer</option>
+</select>
+<span class="role" id="userRole">ADM</span>
+</div>
+<div class="badge-mayur">Created by Mayur</div>
+<div class="history-btns">
+<button id="undoBtn" title="Undo (Ctrl+Z)">↩ Undo</button>
+<button id="redoBtn" title="Redo (Ctrl+Y)">↪ Redo</button>
+<button id="clearHistoryBtn" class="clear-btn" title="Clear history">Clear</button>
+</div>
+</header>
+<nav class="tabs" id="tabsNav"></nav>
+<main class="panel" id="panel"></main>
+<footer class="footer">MiniERP — Created by Mayur</footer>
+</div>
+
+<script>
+// ============================================================
+// MiniERP v12 — Offline Single-File Production ERP
+// Created by Mayur
+// ============================================================
+
+const state = {
+  items: [], machines: [], orders: [], bom: [],
+  placedJobs: [], materialHolds: [], labPlacements: [],
+  breakdowns: [], lockedSlots: [], offSundays: {},
+  scenarios: [], horizon: 7, utilSource: 'main',
+  docCounters: {SO:0,MOP:0,REQ:0,BUY:0,RCV:0,CON:0,FIN:0,MOV:0,BRK:0,JOB:0,MOVD:0},
+  documents: [], movements: [], auditLog: [],
+  org: {
+    company: 'MYR-CO',
+    plants: [
+      {code:'PLT-01', name:'Plant 01', address:'', active:true},
+      {code:'PLT-02', name:'Plant 02', address:'', active:true}
+    ],
+    storageLocations: [
+      {code:'SL-RAW', name:'Raw Material', plant:'PLT-01'},
+      {code:'SL-WIP', name:'Work In Progress', plant:'PLT-01'},
+      {code:'SL-FG', name:'Finished Goods', plant:'PLT-01'},
+      {code:'SL-QC', name:'Quality Check', plant:'PLT-01'},
+      {code:'SL-SCRAP', name:'Scrap', plant:'PLT-01'}
+    ]
+  },
+  currentUser: 'Mayur',
+  currentPlant: 'PLT-01',
+  currentRole: 'ADM',
+  currentTab: 'OBK'
+};
+
+const history = {stack: [], index: -1, max: 40};
+let suppressHistory = false;
+const STORAGE_KEY = 'minierp_v12_fixed2';
+
+// ---------- HISTORY ----------
+function pushHistory() {
+  if (suppressHistory) return;
+  const snap = JSON.parse(JSON.stringify(state));
+  history.stack = history.stack.slice(0, history.index + 1);
+  history.stack.push(snap);
+  if (history.stack.length > history.max) history.stack.shift();
+  else history.index++;
+  if (history.index >= history.max) history.index = history.max - 1;
+  updateHistoryButtons();
+}
+function undo() {
+  if (history.index <= 0) return;
+  history.index--;
+  const snap = JSON.parse(JSON.stringify(history.stack[history.index]));
+  suppressHistory = true;
+  Object.assign(state, snap);
+  suppressHistory = false;
+  saveState();
+  renderAll();
+  updateHistoryButtons();
+}
+function redo() {
+  if (history.index >= history.stack.length - 1) return;
+  history.index++;
+  const snap = JSON.parse(JSON.stringify(history.stack[history.index]));
+  suppressHistory = true;
+  Object.assign(state, snap);
+  suppressHistory = false;
+  saveState();
+  renderAll();
+  updateHistoryButtons();
+}
+function clearHistory() {
+  history.stack = [JSON.parse(JSON.stringify(state))];
+  history.index = 0;
+  updateHistoryButtons();
+}
+function updateHistoryButtons() {
+  const u = document.getElementById('undoBtn'), r = document.getElementById('redoBtn');
+  if (u) u.disabled = history.index <= 0;
+  if (r) r.disabled = history.index >= history.stack.length - 1;
+}
+
+// ---------- STORAGE ----------
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e) { console.warn('Save failed:', e); }
+}
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const p = JSON.parse(saved);
+      Object.assign(state, p);
+      if (!state.docCounters) state.docCounters = {SO:0,MOP:0,REQ:0,BUY:0,RCV:0,CON:0,FIN:0,MOV:0,BRK:0,JOB:0,MOVD:0};
+      if (!state.documents) state.documents = [];
+      if (!state.movements) state.movements = [];
+      if (!state.auditLog) state.auditLog = [];
+      if (!state.org) state.org = {company:'MYR-CO',plants:[],storageLocations:[]};
+      if (!state.labPlacements) state.labPlacements = [];
+      if (!state.lockedSlots) state.lockedSlots = [];
+      if (!state.breakdowns) state.breakdowns = [];
+      if (!state.offSundays) state.offSundays = {};
+      if (!state.scenarios) state.scenarios = [];
+    }
+  } catch(e) { console.warn('Load failed:', e); }
+}
+
+// ---------- DOC SERVICE ----------
+function createDoc(type, payload = {}) {
+  const year = new Date().getFullYear();
+  if (!state.docCounters[type]) state.docCounters[type] = 0;
+  state.docCounters[type]++;
+  const seq = String(state.docCounters[type]).padStart(4, '0');
+  const docNo = `${type}-${year}-${seq}`;
+  const doc = {docNo, type, status: payload.status || 'DRAFT', created: new Date().toISOString(), user: state.currentUser, plant: state.currentPlant, ...payload};
+  state.documents.push(doc);
+  if (payload.parent) linkDocs(payload.parent, docNo);
+  state.auditLog.push({timestamp: new Date().toISOString(), user: state.currentUser, action: `CREATE_${type}`, doc: docNo, before: '', after: JSON.stringify(payload).slice(0,200), reason: payload.reason || ''});
+  saveState();
+  return docNo;
+}
+function linkDocs(parentDocNo, childDocNo) {
+  const parent = state.documents.find(d => d.docNo === parentDocNo);
+  if (parent) { if (!parent.children) parent.children = []; parent.children.push(childDocNo); }
+  const child = state.documents.find(d => d.docNo === childDocNo);
+  if (child) child.parent = parentDocNo;
+  saveState();
+}
+function addMovement(material, qty, code, refDoc) {
+  const docNo = createDoc('MOVD', {material, qty, movementCode: code, refDoc});
+  const dir = [110,120,320,410,510,610].includes(code) ? '+' : [210,220,230,310,420,520].includes(code) ? '-' : '±';
+  state.movements.push({docNo, date: new Date().toISOString(), material, qty, code, direction: dir, refDoc: refDoc || '', user: state.currentUser});
+  saveState();
+  return docNo;
+}
+function addAudit(action, doc, before, after, reason) {
+  state.auditLog.push({timestamp: new Date().toISOString(), user: state.currentUser, action, doc: doc || '', before: before || '', after: after || '', reason: reason || ''});
+  saveState();
+}
+
+// ---------- NAV ----------
+const NAV_CODES = {OBK:'Order Booking',PLN:'Planning / BOM',SCH:'Machine Scheduling',UTL:'Utilisation',CTW:'Control Tower',DLF:'Deadline Feasibility',SHR:'Shortage Roll-up',SCN:'Scenarios',MLB:'Multi-Level BOM',MST:'Machine & Item Master',LAB:'Drag-Drop Lab',ORG:'Org Structure',FLW:'Document Flow',APR:'Approvals Inbox',LDG:'Material Ledger',LOG:'Transaction Log'};
+const TAB_ORDER = Object.keys(NAV_CODES);
+
+// ---------- SEED ----------
+function seedDefaults() {
+  if (state.machines.length === 0) {
+    state.machines = [
+      {code:'WC-P01', name:'Press-01', plant:'PLT-01', active:true, shifts:3},
+      {code:'WC-P02', name:'Press-02', plant:'PLT-01', active:true, shifts:3},
+      {code:'WC-P03', name:'Press-03', plant:'PLT-01', active:true, shifts:3}
+    ];
+  }
+  if (state.items.length === 0) {
+    state.items = [
+      {material:'Widget-A', desc:'Widget A', type:'FG', unit:'pcs', cycle:0.6, lead:2, safety:0, reorder:0, cost:10, storage:'SL-FG', inspect:false, stock:0},
+      {material:'Widget-B', desc:'Widget B', type:'FG', unit:'pcs', cycle:1.2, lead:3, safety:0, reorder:0, cost:12, storage:'SL-FG', inspect:false, stock:0},
+      {material:'Gadget-X', desc:'Gadget X', type:'FG', unit:'pcs', cycle:0.8, lead:2, safety:0, reorder:0, cost:15, storage:'SL-FG', inspect:false, stock:0},
+      {material:'Widget-C', desc:'Widget C', type:'FG', unit:'pcs', cycle:1.5, lead:4, safety:0, reorder:0, cost:20, storage:'SL-FG', inspect:false, stock:0},
+      {material:'Alu-sheet', desc:'Aluminium Sheet', type:'RM', unit:'kg', cycle:0, lead:2, safety:0, reorder:0, cost:5, storage:'SL-RAW', inspect:true, stock:500},
+      {material:'Resin-B', desc:'Resin B', type:'RM', unit:'kg', cycle:0, lead:2, safety:0, reorder:0, cost:8, storage:'SL-RAW', inspect:false, stock:300}
+    ];
+  }
+  if (state.orders.length === 0) {
+    const t = new Date();
+    const d = off => { const dt = new Date(t); dt.setDate(dt.getDate()+off); return dt.toISOString().slice(0,10); };
+    state.orders = [
+      {so:'SO-2026-0001', item:'Widget-A', reqQty:1000, lastStock:200, scheduleDate:d(3), primaryWC:'WC-P01', altWC:'WC-P02'},
+      {so:'SO-2026-0002', item:'Widget-B', reqQty:800, lastStock:100, scheduleDate:d(5), primaryWC:'WC-P02', altWC:'WC-P03'},
+      {so:'SO-2026-0003', item:'Gadget-X', reqQty:600, lastStock:50, scheduleDate:d(7), primaryWC:'WC-P03', altWC:'WC-P01'},
+      {so:'SO-2026-0004', item:'Widget-C', reqQty:400, lastStock:0, scheduleDate:d(10), primaryWC:'WC-P01', altWC:'WC-P02'}
+    ];
+  }
+  if (state.bom.length === 0) {
+    state.bom = [
+      {parent:'Widget-A', child:'Alu-sheet', perUnit:0.05, available:500, lead:2},
+      {parent:'Widget-A', child:'Resin-B', perUnit:0.02, available:300, lead:2},
+      {parent:'Widget-B', child:'Alu-sheet', perUnit:0.08, available:20, lead:3},
+      {parent:'Gadget-X', child:'Resin-B', perUnit:0.03, available:400, lead:2}
+    ];
+  }
+}
+
+// ---------- UTILS ----------
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function addDays(d, n) { const dt = new Date(d); dt.setDate(dt.getDate()+n); return dt.toISOString().slice(0,10); }
+function round1(n) { return Math.round(n*10)/10; }
+function moldingHours(q, c) { if (!c || c <= 0) return 0.5; return Math.max(0.5, round1(q*c/60)); }
+function isSunday(d) { return new Date(d).getDay() === 0; }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function num(v, def = 0) { const n = parseFloat(v); return isNaN(n) ? def : n; }
+const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtShort(d) {
+  const dt = new Date(d);
+  return DOW[dt.getDay()] + ' ' + dt.getDate() + ' ' + MONTHS[dt.getMonth()];
+}
+function fmtLong(d) {
+  const dt = new Date(d);
+  return DOW[dt.getDay()] + ', ' + dt.getDate() + ' ' + MONTHS[dt.getMonth()] + ' ' + dt.getFullYear();
+}
+
+// ---------- SUNDAY WORKING (per week key = YYYY-Www) ----------
+function getWeekKey(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay();
+  // Use Monday as week start
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - ((day + 6) % 7));
+  const year = monday.getFullYear();
+  // ISO week number
+  const target = new Date(monday);
+  target.setHours(0,0,0,0);
+  const dayNum = (target.getDay() + 6) % 7;
+  target.setDate(target.getDate() - dayNum + 3);
+  const firstThursday = new Date(target.getFullYear(), 0, 4);
+  const diff = target.getTime() - firstThursday.getTime();
+  const week = 1 + Math.round(diff / (7 * 24 * 3600 * 1000));
+  return year + '-W' + String(week).padStart(2, '0');
+}
+function isSundayWorking(dateStr) {
+  return !!state.offSundays[getWeekKey(dateStr)];
+}
+
+// ---------- MATERIAL GATING ----------
+function getMaterialStatus(order) {
+  const item = state.items.find(i => i.material === order.item);
+  if (!item) return {status:'block', label:'BLOCK', color:'badge-block', available:0, required:0, minRatio:0};
+  const bomRows = state.bom.filter(b => b.parent === order.item);
+  if (bomRows.length === 0) return {status:'ok', label:'OK', color:'badge-ok', available:1, required:0, minRatio:1};
+  const netQty = Math.max(0, order.reqQty - order.lastStock);
+  if (netQty === 0) return {status:'ok', label:'OK', color:'badge-ok', available:1, required:0, minRatio:1};
+  let minRatio = 1, allBlocked = true;
+  for (const b of bomRows) {
+    const req = netQty * b.perUnit;
+    const avail = num(b.available);
+    if (avail > 0) allBlocked = false;
+    const ratio = req > 0 ? Math.min(1, avail/req) : 1;
+    if (ratio < minRatio) minRatio = ratio;
+  }
+  if (allBlocked) return {status:'block', label:'BLOCK', color:'badge-block', available:0, required:netQty, minRatio:0};
+  if (minRatio >= 1) return {status:'ok', label:'OK', color:'badge-ok', available:1, required:netQty, minRatio:1};
+  if (minRatio > 0) return {status:'partial', label:'PARTIAL', color:'badge-partial', available:minRatio, required:netQty, minRatio};
+  return {status:'hold', label:'HOLD', color:'badge-hold', available:0, required:netQty, minRatio:0};
+}
+function getMoldableQty(order) {
+  const net = Math.max(0, order.reqQty - order.lastStock);
+  const m = getMaterialStatus(order);
+  if (m.status === 'ok') return net;
+  if (m.status === 'partial') return Math.floor(net * m.minRatio);
+  return 0;
+}
+
+// ---------- SCHEDULER ----------
+function runScheduler() {
+  const horizon = state.horizon || 7;
+  const today = todayISO();
+  const days = [];
+  for (let i = 0; i < horizon; i++) days.push(addDays(today, i));
+  state.placedJobs = [];
+  state.materialHolds = [];
+  const sorted = [...state.orders].sort((a,b) => (a.scheduleDate||'').localeCompare(b.scheduleDate||''));
+  const load = {};
+  for (const m of state.machines) {
+    if (!m.active) continue;
+    load[m.code] = {};
+    for (const d of days) load[m.code][d] = [0,0,0];
+  }
+  // Preload locked slots
+  for (const ls of state.lockedSlots) {
+    if (!load[ls.machine]) continue;
+    if (!load[ls.machine][ls.date]) continue;
+    load[ls.machine][ls.date][ls.shift] += ls.hours;
+    state.placedJobs.push({...ls, type: 'locked'});
+  }
+  for (const order of sorted) {
+    const item = state.items.find(i => i.material === order.item);
+    const cycle = item ? item.cycle : 0;
+    const netQty = Math.max(0, order.reqQty - order.lastStock);
+    if (netQty <= 0) continue;
+    const moldable = getMoldableQty(order);
+    if (moldable <= 0) { state.materialHolds.push({so: order.so, item: order.item, qty: netQty, reason: 'Material shortage'}); continue; }
+    const hours = moldingHours(moldable, cycle);
+    const loadingHours = 4;
+    const totalHours = hours + loadingHours;
+    const machinesToTry = [...new Set([order.primaryWC, order.altWC].filter(Boolean))].filter(m => load[m]);
+    let placed = false;
+    for (const mCode of machinesToTry) {
+      for (const d of days) {
+        // Sunday OFF unless user toggled working
+        if (isSunday(d) && !isSundayWorking(d)) continue;
+        for (let s = 0; s < 3; s++) {
+          const free = 8 - (load[mCode][d][s] || 0);
+          if (free >= totalHours) {
+            const jobNo = createDoc('JOB', {machine: mCode, date: d, shift: s, hours: totalHours, so: order.so, item: order.item, qty: moldable});
+            state.placedJobs.push({jobNo, so: order.so, item: order.item, qty: moldable, machine: mCode, date: d, shift: s, hours: totalHours, moldingHours: hours, loadingHours, type: 'auto'});
+            load[mCode][d][s] += totalHours;
+            placed = true;
+            break;
+          }
+        }
+        if (placed) break;
+      }
+      if (placed) break;
+    }
+    if (!placed) state.materialHolds.push({so: order.so, item: order.item, qty: netQty, reason: 'No capacity'});
+  }
+  saveState();
+}
+
+// ---------- RENDER ----------
+function renderAll() {
+  renderPlantSelect();
+  renderTabs();
+  renderPanel();
+  updateHistoryButtons();
+  const roleEl = document.getElementById('userRole');
+  if (roleEl) roleEl.textContent = state.currentRole;
+}
+
+function renderPlantSelect() {
+  const sel = document.getElementById('plantSelect');
+  if (!sel) return;
+  sel.innerHTML = '';
+  for (const p of state.org.plants) {
+    const opt = document.createElement('option');
+    opt.value = p.code; opt.textContent = p.name + ' (' + p.code + ')';
+    if (p.code === state.currentPlant) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  sel.onchange = e => { state.currentPlant = e.target.value; saveState(); renderAll(); };
+}
+
+function renderTabs() {
+  const nav = document.getElementById('tabsNav');
+  if (!nav) return;
+  nav.innerHTML = '';
+  for (const code of TAB_ORDER) {
+    const t = document.createElement('div');
+    t.className = 'tab' + (state.currentTab === code ? ' active' : '');
+    t.innerHTML = `${NAV_CODES[code]} <span class="nav-code">${code}</span>`;
+    t.onclick = () => { state.currentTab = code; saveState(); renderAll(); };
+    nav.appendChild(t);
+  }
+}
+
+function renderPanel() {
+  const p = document.getElementById('panel');
+  if (!p) return;
+  p.innerHTML = '';
+  switch (state.currentTab) {
+    case 'OBK': renderOBK(p); break;
+    case 'PLN': renderPLN(p); break;
+    case 'SCH': renderSCH(p); break;
+    case 'UTL': renderUTL(p); break;
+    case 'CTW': renderCTW(p); break;
+    case 'DLF': renderDLF(p); break;
+    case 'SHR': renderSHR(p); break;
+    case 'SCN': renderSCN(p); break;
+    case 'MLB': renderMLB(p); break;
+    case 'MST': renderMST(p); break;
+    case 'LAB': renderLAB(p); break;
+    case 'ORG': renderORG(p); break;
+    case 'FLW': renderFLW(p); break;
+    case 'APR': renderAPR(p); break;
+    case 'LDG': renderLDG(p); break;
+    case 'LOG': renderLOG(p); break;
+    default: p.innerHTML = '<p>Select a tab.</p>';
+  }
+}
+
+// ============================================================
+// TAB 1 — OBK
+// ============================================================
+function renderOBK(panel) {
+  panel.innerHTML = `
+    <h2>Order Booking <span class="code-badge">OBK</span></h2>
+    <p class="section-desc">Edit any cell directly. All changes auto-save.</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="addOrderBtn">+ Add Order</button>
+      <button class="btn" id="exportOrdersBtn">Export CSV</button>
+      <button class="btn btn-primary" id="createMOPsBtn">Create Molding Orders</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="ordersTable">
+        <thead><tr>
+          <th>SO No</th><th>Item</th><th>Req Qty</th><th>Last Stock</th><th>Net Qty</th>
+          <th>Schedule Date</th><th>Primary WC</th><th>Alt WC</th><th>Cycle</th>
+          <th>Moldable</th><th>Molding Hrs</th><th>Material</th><th>Warnings</th><th></th>
+        </tr></thead>
+        <tbody id="ordersBody"></tbody>
+      </table>
+    </div>
+  `;
+  function renderRows() {
+    const tb = document.getElementById('ordersBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    state.orders.forEach((o, idx) => {
+      const item = state.items.find(i => i.material === o.item);
+      const cycle = item ? item.cycle : 0;
+      const net = Math.max(0, o.reqQty - o.lastStock);
+      const mold = getMoldableQty(o);
+      const hrs = moldingHours(mold, cycle);
+      const mat = getMaterialStatus(o);
+      const warns = [];
+      if (state.orders.some((x, j) => j !== idx && x.item === o.item)) warns.push('<span class="badge badge-warning">Dup item</span>');
+      if (item && (!item.cycle || item.cycle <= 0)) warns.push('<span class="badge badge-warning">No cycle</span>');
+      if (o.primaryWC === o.altWC) warns.push('<span class="badge badge-warning">Same WC</span>');
+      if (mat.status === 'block') warns.push('<span class="badge badge-block">Shortage</span>');
+      if (o.primaryWC && o.altWC && o.primaryWC === o.altWC) warns.push('<span class="badge badge-warning">Same machine</span>');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${esc(o.so)}" data-idx="${idx}" data-field="so" style="min-width:100px"></td>
+        <td><select data-idx="${idx}" data-field="item">${state.items.filter(i => i.type === 'FG').map(i => `<option ${i.material===o.item?'selected':''}>${esc(i.material)}</option>`).join('')}</select></td>
+        <td><input type="number" value="${o.reqQty}" data-idx="${idx}" data-field="reqQty" style="width:80px"></td>
+        <td><input type="number" value="${o.lastStock}" data-idx="${idx}" data-field="lastStock" style="width:80px"></td>
+        <td class="num">${net}</td>
+        <td><input type="date" value="${o.scheduleDate}" data-idx="${idx}" data-field="scheduleDate" style="width:130px"></td>
+        <td><select data-idx="${idx}" data-field="primaryWC">${state.machines.filter(m=>m.active).map(m => `<option ${m.code===o.primaryWC?'selected':''}>${esc(m.code)}</option>`).join('')}</select></td>
+        <td><select data-idx="${idx}" data-field="altWC">${state.machines.filter(m=>m.active).map(m => `<option ${m.code===o.altWC?'selected':''}>${esc(m.code)}</option>`).join('')}</select></td>
+        <td class="num">${cycle ? cycle.toFixed(2) : '—'}</td>
+        <td class="num">${mold}</td>
+        <td class="num">${hrs}</td>
+        <td><span class="badge ${mat.color}">${mat.label}</span></td>
+        <td>${warns.length ? warns.join(' ') : '<span class="badge badge-ok">OK</span>'}</td>
+        <td><button class="btn btn-sm" onclick="openFlowModal('${esc(o.so)}')">Flow</button> <button class="btn btn-sm btn-danger" onclick="delOrder(${idx})">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input, select').forEach(el => {
+      const evt = el.tagName === 'SELECT' || el.type === 'date' ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        const idx = parseInt(el.dataset.idx);
+        const field = el.dataset.field;
+        pushHistory();
+        if (field === 'reqQty' || field === 'lastStock') state.orders[idx][field] = num(el.value);
+        else state.orders[idx][field] = el.value;
+        saveState();
+        renderRows();
+      });
+    });
+  }
+  window.delOrder = idx => { pushHistory(); state.orders.splice(idx, 1); saveState(); renderRows(); };
+  renderRows();
+  document.getElementById('addOrderBtn').onclick = () => {
+    pushHistory();
+    const year = new Date().getFullYear();
+    state.docCounters.SO = (state.docCounters.SO || 0) + 1;
+    const so = `SO-${year}-${String(state.docCounters.SO).padStart(4,'0')}`;
+    state.orders.push({so, item:'Widget-A', reqQty:100, lastStock:0, scheduleDate:addDays(todayISO(), 7), primaryWC:'WC-P01', altWC:'WC-P02'});
+    saveState();
+    renderRows();
+    addAudit('ADD_ORDER', so, '', '');
+  };
+  document.getElementById('exportOrdersBtn').onclick = () => {
+    const rows = [['SO No','Item','Req Qty','Last Stock','Net Qty','Schedule Date','Primary WC','Alt WC','Cycle','Moldable','Molding Hrs','Material Status']];
+    for (const o of state.orders) {
+      const item = state.items.find(i => i.material === o.item);
+      const cycle = item ? item.cycle : 0;
+      const mold = getMoldableQty(o);
+      rows.push([o.so, o.item, o.reqQty, o.lastStock, Math.max(0,o.reqQty-o.lastStock), o.scheduleDate, o.primaryWC, o.altWC, cycle, mold, moldingHours(mold,cycle), getMaterialStatus(o).label]);
+    }
+    exportCSVRaw('Orders Export', rows);
+  };
+  document.getElementById('createMOPsBtn').onclick = () => {
+    pushHistory();
+    let count = 0;
+    for (const o of state.orders) {
+      if (!o.mop) {
+        o.mop = createDoc('MOP', {so: o.so, item: o.item, qty: Math.max(0,o.reqQty-o.lastStock), status: 'RELEASED'});
+        count++;
+      }
+    }
+    saveState();
+    renderRows();
+    alert(`Created ${count} molding orders.`);
+  };
+}
+
+// ============================================================
+// TAB 2 — PLN
+// ============================================================
+function renderPLN(panel) {
+  panel.innerHTML = `
+    <h2>Planning / BOM <span class="code-badge">PLN</span></h2>
+    <p class="section-desc">Edit BOM rows directly. Changes auto-save.</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="addBomBtn">+ Add BOM Row</button>
+      <button class="btn" id="exportPlanBtn">Export CSV</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table id="bomTable">
+        <thead><tr>
+          <th>Parent</th><th>Child</th><th>Per Unit</th><th>Available</th><th>Lead</th>
+          <th>Required</th><th>Shortage</th><th>ETA</th><th>Conv %</th><th>Conv Qty</th><th>Status</th><th></th>
+        </tr></thead>
+        <tbody id="bomBody"></tbody>
+      </table>
+    </div>
+  `;
+  function renderRows() {
+    const tb = document.getElementById('bomBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    state.bom.forEach((b, idx) => {
+      const order = state.orders.find(o => o.item === b.parent);
+      const net = order ? Math.max(0, order.reqQty - order.lastStock) : 0;
+      const req = net * b.perUnit;
+      const avail = num(b.available);
+      const short = Math.max(0, req - avail);
+      const conv = req > 0 ? Math.min(100, (avail/req)*100) : 100;
+      const convQty = b.perUnit > 0 ? Math.floor(avail / b.perUnit) : 0;
+      const eta = addDays(todayISO(), num(b.lead));
+      let status = 'OK', badge = 'badge-ok';
+      if (req > 0 && avail <= 0) { status = 'BLOCK'; badge = 'badge-block'; }
+      else if (short > 0) { status = 'PARTIAL'; badge = 'badge-partial'; }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><select data-idx="${idx}" data-field="parent">${state.items.filter(i=>i.type==='FG').map(i=>`<option ${i.material===b.parent?'selected':''}>${esc(i.material)}</option>`).join('')}</select></td>
+        <td><select data-idx="${idx}" data-field="child">${state.items.map(i=>`<option ${i.material===b.child?'selected':''}>${esc(i.material)}</option>`).join('')}</select></td>
+        <td><input type="number" step="0.001" value="${b.perUnit}" data-idx="${idx}" data-field="perUnit" style="width:70px"></td>
+        <td><input type="number" value="${b.available}" data-idx="${idx}" data-field="available" style="width:70px"></td>
+        <td><input type="number" value="${b.lead}" data-idx="${idx}" data-field="lead" style="width:55px"></td>
+        <td class="num">${req.toFixed(2)}</td>
+        <td class="num">${short.toFixed(2)}</td>
+        <td>${eta}</td>
+        <td class="num">${conv.toFixed(1)}%</td>
+        <td class="num">${convQty}</td>
+        <td><span class="badge ${badge}">${status}</span></td>
+        <td><button class="btn btn-sm btn-danger" onclick="delBom(${idx})">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input, select').forEach(el => {
+      const evt = el.tagName === 'SELECT' ? 'change' : 'input';
+      el.addEventListener(evt, () => {
+        const idx = parseInt(el.dataset.idx);
+        const field = el.dataset.field;
+        pushHistory();
+        if (['perUnit','available','lead'].includes(field)) state.bom[idx][field] = num(el.value);
+        else state.bom[idx][field] = el.value;
+        saveState();
+        renderRows();
+      });
+    });
+  }
+  window.delBom = idx => { pushHistory(); state.bom.splice(idx, 1); saveState(); renderRows(); };
+  renderRows();
+  document.getElementById('addBomBtn').onclick = () => {
+    pushHistory();
+    const fg = state.items.find(i => i.type === 'FG');
+    const rm = state.items.find(i => i.type === 'RM');
+    state.bom.push({parent: fg ? fg.material : 'Widget-A', child: rm ? rm.material : 'Alu-sheet', perUnit: 0.01, available: 100, lead: 2});
+    saveState();
+    renderRows();
+  };
+  document.getElementById('exportPlanBtn').onclick = () => {
+    const rows = [['--- ORDERS ---'], ['SO','Item','Net Qty','Schedule Date']];
+    for (const o of state.orders) rows.push([o.so, o.item, Math.max(0,o.reqQty-o.lastStock), o.scheduleDate]);
+    rows.push([]);
+    rows.push(['--- BOM ---']);
+    rows.push(['Parent','Child','Per Unit','Required','Available','Shortage','ETA','Status']);
+    for (const b of state.bom) {
+      const order = state.orders.find(o => o.item === b.parent);
+      const net = order ? Math.max(0, order.reqQty - order.lastStock) : 0;
+      const req = net * b.perUnit;
+      const avail = num(b.available);
+      const short = Math.max(0, req - avail);
+      rows.push([b.parent, b.child, b.perUnit, req.toFixed(2), avail, short.toFixed(2), addDays(todayISO(), b.lead), short > 0 ? 'PARTIAL' : 'OK']);
+    }
+    exportCSVRaw('Planning Export', rows);
+  };
+}
+
+// ============================================================
+// TAB 3 — SCH (with Sunday toggles)
+// ============================================================
+function renderSCH(panel) {
+  panel.innerHTML = `
+    <h2>Machine Scheduling <span class="code-badge">SCH</span></h2>
+    <p class="section-desc">Auto-scheduler with locked slots, breakdowns, and holds.</p>
+    <div class="flex-row">
+      <label>Horizon: <select id="horizonSelect">
+        <option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option>
+      </select></label>
+      <button class="btn btn-primary" id="runSchedBtn">Run Auto-Scheduler</button>
+      <button class="btn" id="exportSchedBtn">Export CSV</button>
+      <button class="btn" id="addBreakdownBtn">+ Breakdown</button>
+    </div>
+    <div id="sundayPanel" class="sunday-toggle"></div>
+    <div id="schedGrid" class="schedule-grid mt-16"></div>
+    <h3>Placed Jobs</h3>
+    <div style="overflow-x:auto;">
+      <table><thead><tr><th>JOB No</th><th>SO</th><th>Item</th><th>Qty</th><th>Machine</th><th>Date</th><th>Shift</th><th>Hours</th><th>Type</th></tr></thead>
+      <tbody id="jobsBody"></tbody></table>
+    </div>
+    <h3>Material Holds</h3>
+    <div style="overflow-x:auto;">
+      <table><thead><tr><th>SO</th><th>Item</th><th>Qty</th><th>Reason</th></tr></thead>
+      <tbody id="holdsBody"></tbody></table>
+    </div>
+  `;
+  const hs = document.getElementById('horizonSelect');
+  hs.value = state.horizon || 7;
+  hs.onchange = () => { state.horizon = parseInt(hs.value); saveState(); renderSundayPanel(); renderGrid(); };
+
+  function getDays() {
+    const horizon = state.horizon || 7;
+    const days = [];
+    for (let i = 0; i < horizon; i++) days.push(addDays(todayISO(), i));
+    return days;
+  }
+
+  function renderSundayPanel() {
+    const c = document.getElementById('sundayPanel');
+    if (!c) return;
+    const days = getDays();
+    const sundays = days.filter(d => isSunday(d));
+    if (sundays.length === 0) { c.innerHTML = '<span class="text-muted">No Sundays in selected horizon.</span>'; return; }
+    // Group by week
+    const weekMap = {};
+    for (const s of sundays) {
+      const wk = getWeekKey(s);
+      if (!weekMap[wk]) weekMap[wk] = [];
+      weekMap[wk].push(s);
+    }
+    let html = '<span style="font-weight:600;color:#78350f;font-size:.85rem">🔧 Working Sundays:</span>';
+    for (const [wk, dates] of Object.entries(weekMap)) {
+      const working = state.offSundays[wk];
+      html += `<label class="${working?'checked':''}"><input type="checkbox" data-week="${wk}" ${working?'checked':''}> ${wk} — ${dates.map(d => fmtShort(d)).join(', ')}</label>`;
+    }
+    c.innerHTML = html;
+    c.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        pushHistory();
+        const wk = cb.dataset.week;
+        if (cb.checked) state.offSundays[wk] = true;
+        else delete state.offSundays[wk];
+        saveState();
+        renderSundayPanel();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('schedGrid');
+    if (!grid) return;
+    const days = getDays();
+    let html = '<table><thead><tr><th>Machine</th>';
+    for (const d of days) {
+      const sunOff = isSunday(d) && !isSundayWorking(d);
+      const sunWork = isSunday(d) && isSundayWorking(d);
+      html += `<th class="${sunOff||sunWork?'sunday-col':''}">${fmtShort(d)}${sunOff?'<br><small>OFF</small>':sunWork?'<br><small>WORK</small>':''}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    for (const m of state.machines) {
+      if (!m.active) continue;
+      html += `<tr><td class="machine-label">${esc(m.name)}<br>${esc(m.code)}</td>`;
+      for (const d of days) {
+        const sunOff = isSunday(d) && !isSundayWorking(d);
+        html += `<td class="${sunOff?'sunday-cell':''}">`;
+        if (sunOff) { html += '<span class="shift-block off-sunday">OFF</span>'; }
+        else {
+          const jobs = state.placedJobs.filter(j => j.machine === m.code && j.date === d);
+          for (const j of jobs) {
+            const order = state.orders.find(o => o.so === j.so);
+            const isPrimary = order && order.primaryWC === m.code;
+            const cls = j.type === 'locked' ? 'locked' : (isPrimary ? 'molding-primary' : 'molding-alt');
+            html += `<span class="shift-block ${cls}">${esc(j.jobNo||'')}<br>${j.moldingHours}h</span>`;
+          }
+          const brk = state.breakdowns.find(b => b.machine === m.code && b.date === d);
+          if (brk) html += `<span class="shift-block breakdown">BRK ${brk.hours}h</span>`;
+          const held = state.materialHolds.filter(h => {
+            const o = state.orders.find(oo => oo.so === h.so);
+            return o && o.primaryWC === m.code;
+          });
+          if (held.length > 0 && !brk) html += `<span class="shift-block held">HELD ${held.length}</span>`;
+          if (jobs.length === 0 && !brk && held.length === 0) html += '<span class="text-muted">—</span>';
+        }
+        html += '</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    grid.innerHTML = html;
+  }
+
+  function renderJobs() {
+    const tb = document.getElementById('jobsBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    for (const j of state.placedJobs) {
+      tb.innerHTML += `<tr><td>${esc(j.jobNo||'')}</td><td>${esc(j.so)}</td><td>${esc(j.item)}</td><td class="num">${j.qty}</td><td>${esc(j.machine)}</td><td>${j.date}</td><td>${j.shift}</td><td class="num">${j.hours}</td><td>${esc(j.type||'auto')}</td></tr>`;
+    }
+    const hb = document.getElementById('holdsBody');
+    if (!hb) return;
+    hb.innerHTML = '';
+    for (const h of state.materialHolds) {
+      hb.innerHTML += `<tr><td>${esc(h.so)}</td><td>${esc(h.item)}</td><td class="num">${h.qty}</td><td>${esc(h.reason)}</td></tr>`;
+    }
+  }
+
+  renderSundayPanel();
+  renderGrid();
+  renderJobs();
+
+  document.getElementById('runSchedBtn').onclick = () => {
+    pushHistory();
+    runScheduler();
+    renderGrid();
+    renderJobs();
+  };
+
+  document.getElementById('addBreakdownBtn').onclick = () => {
+    const machine = prompt('Machine code (e.g. WC-P01):');
+    if (!machine) return;
+    const date = prompt('Date (YYYY-MM-DD):', todayISO());
+    if (!date) return;
+    const hours = parseFloat(prompt('Hours:', '4'));
+    const reason = prompt('Reason:', '');
+    pushHistory();
+    const brk = createDoc('BRK', {machine, date, hours, reason});
+    state.breakdowns.push({docNo: brk, machine, date, hours: num(hours, 4), reason: reason || ''});
+    saveState();
+    renderGrid();
+  };
+
+  document.getElementById('exportSchedBtn').onclick = () => {
+    const rows = [['--- PLACED JOBS ---'], ['JOB No','SO','Item','Qty','Machine','Date','Shift','Hours','Type']];
+    for (const j of state.placedJobs) rows.push([j.jobNo||'', j.so, j.item, j.qty, j.machine, j.date, j.shift, j.hours, j.type||'auto']);
+    rows.push([]); rows.push(['--- HOLDS ---']); rows.push(['SO','Item','Qty','Reason']);
+    for (const h of state.materialHolds) rows.push([h.so, h.item, h.qty, h.reason]);
+    exportCSVRaw('Schedule Export', rows);
+  };
+}
+
+// ============================================================
+// TAB 4 — UTL
+// ============================================================
+function renderUTL(panel) {
+  panel.innerHTML = `
+    <h2>Utilisation <span class="code-badge">UTL</span></h2>
+    <p class="section-desc">Hand-drawn SVG charts: bar, donut, stacked, line, heatmap.</p>
+    <div class="btn-group">
+      <label>Source: <select id="utilSource">
+        <option value="main">Main Schedule</option>
+        <option value="lab">Drag-Drop Lab</option>
+      </select></label>
+      <button class="btn" id="exportUtilBtn">Export CSV</button>
+    </div>
+    <div id="utilCharts"></div>
+  `;
+  const ss = document.getElementById('utilSource');
+  ss.value = state.utilSource || 'main';
+  ss.onchange = () => { state.utilSource = ss.value; saveState(); renderCharts(); };
+
+  function getJobs() {
+    return state.utilSource === 'lab'
+      ? state.labPlacements.map(p => {
+          const o = state.orders.find(oo => oo.so === p.so);
+          const it = o ? state.items.find(i => i.material === o.item) : null;
+          const qty = o ? Math.max(0, o.reqQty - o.lastStock) : 0;
+          return {machine: p.machine, item: o ? o.item : '', hours: moldingHours(qty, it ? it.cycle : 0), date: p.date || addDays(todayISO(), p.day)};
+        })
+      : state.placedJobs;
+  }
+
+  function renderCharts() {
+    const c = document.getElementById('utilCharts');
+    if (!c) return;
+    const jobs = getJobs();
+    const horizon = state.horizon || 7;
+    const days = [];
+    for (let i = 0; i < horizon; i++) days.push(addDays(todayISO(), i));
+    // Working Sundays only extend hours
+    const workingDays = days.filter(d => !isSunday(d) || isSundayWorking(d));
+    const maxHoursPerDay = 24;
+    const perMachine = {};
+    for (const m of state.machines.filter(m => m.active)) perMachine[m.code] = {hours: 0, jobs: 0, name: m.name};
+    for (const j of jobs) {
+      if (!perMachine[j.machine]) perMachine[j.machine] = {hours: 0, jobs: 0, name: j.machine};
+      perMachine[j.machine].hours += j.hours || 0;
+      perMachine[j.machine].jobs++;
+    }
+    const perItem = {};
+    for (const j of jobs) {
+      if (!j.item) continue;
+      perItem[j.item] = (perItem[j.item] || 0) + (j.hours || 0);
+    }
+    const perDayMachine = {};
+    for (const d of days) {
+      perDayMachine[d] = {};
+      for (const m of Object.keys(perMachine)) perDayMachine[d][m] = {molding: 0, loading: 0};
+    }
+    for (const j of jobs) {
+      if (!perDayMachine[j.date]) continue;
+      if (!perDayMachine[j.date][j.machine]) perDayMachine[j.date][j.machine] = {molding: 0, loading: 0};
+      perDayMachine[j.date][j.machine].molding += (j.moldingHours || j.hours || 0);
+      perDayMachine[j.date][j.machine].loading += (j.loadingHours || 0);
+    }
+
+    let html = '';
+
+    // 1. Bar — utilisation %
+    html += '<h3>Utilisation % per Machine</h3>';
+    html += '<div class="chart-container"><svg viewBox="0 0 700 260" width="100%" style="max-width:700px">';
+    const totalHorizonHours = maxHoursPerDay * workingDays.length;
+    const machineKeys = Object.keys(perMachine);
+    const barW = Math.min(70, 600 / Math.max(machineKeys.length, 1) - 20);
+    const gap = 20;
+    let x = 60;
+    html += `<line x1="50" y1="220" x2="680" y2="220" stroke="#94a3b8" stroke-width="1"/>`;
+    html += `<line x1="50" y1="20" x2="50" y2="220" stroke="#94a3b8" stroke-width="1"/>`;
+    for (let p = 0; p <= 100; p += 25) {
+      const y = 220 - (p/100)*200;
+      html += `<line x1="45" y1="${y}" x2="50" y2="${y}" stroke="#94a3b8"/>`;
+      html += `<text x="42" y="${y+3}" font-size="10" text-anchor="end" fill="#64748b">${p}%</text>`;
+    }
+    html += `<defs><linearGradient id="gradBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#0f3b7a"/></linearGradient></defs>`;
+    for (const k of machineKeys) {
+      const pct = totalHorizonHours ? Math.min(100, (perMachine[k].hours / totalHorizonHours) * 100) : 0;
+      const h = (pct/100)*200;
+      const y = 220 - h;
+      html += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="url(#gradBar)" rx="4"/>`;
+      html += `<text x="${x+barW/2}" y="${y-6}" font-size="11" text-anchor="middle" fill="#0f3b7a" font-weight="600">${pct.toFixed(0)}%</text>`;
+      html += `<text x="${x+barW/2}" y="238" font-size="10" text-anchor="middle" fill="#334155">${esc(perMachine[k].name)}</text>`;
+      x += barW + gap;
+    }
+    html += '</svg></div>';
+
+    // 2. Donut
+    html += '<h3>Share of Total Hours (Donut)</h3>';
+    html += '<div class="chart-container"><svg viewBox="0 0 320 320" width="100%" style="max-width:320px">';
+    const totalHrs = machineKeys.reduce((s, k) => s + perMachine[k].hours, 0) || 1;
+    const colors = ['#0f3b7a','#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2'];
+    const cx = 160, cy = 160, r = 110, ir = 65;
+    let angle = -Math.PI/2;
+    machineKeys.forEach((k, i) => {
+      const frac = perMachine[k].hours / totalHrs;
+      const a2 = angle + frac * 2 * Math.PI;
+      const largeArc = frac > 0.5 ? 1 : 0;
+      const x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+      const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+      const ix1 = cx + ir * Math.cos(angle), iy1 = cy + ir * Math.sin(angle);
+      const ix2 = cx + ir * Math.cos(a2), iy2 = cy + ir * Math.sin(a2);
+      html += `<path d="M${x1},${y1} A${r},${r} 0 ${largeArc} 1 ${x2},${y2} L${ix2},${iy2} A${ir},${ir} 0 ${largeArc} 0 ${ix1},${iy1} Z" fill="${colors[i%colors.length]}" stroke="#fff" stroke-width="2"/>`;
+      angle = a2;
+    });
+    html += `<circle cx="${cx}" cy="${cy}" r="${ir}" fill="#fff"/>`;
+    html += `<text x="${cx}" y="${cy-5}" font-size="13" text-anchor="middle" fill="#0f3b7a" font-weight="700">${totalHrs.toFixed(0)}h</text>`;
+    html += `<text x="${cx}" y="${cy+12}" font-size="10" text-anchor="middle" fill="#64748b">Total</text>`;
+    html += '</svg>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px">';
+    machineKeys.forEach((k, i) => {
+      const pct = ((perMachine[k].hours/totalHrs)*100).toFixed(1);
+      html += `<span style="font-size:.75rem;display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:${colors[i%colors.length]};border-radius:2px;display:inline-block"></span>${esc(k)} — ${pct}%</span>`;
+    });
+    html += '</div></div>';
+
+    // 3. Stacked bar
+    html += '<h3>Daily Molding vs Loading (Stacked)</h3>';
+    html += '<div class="chart-container"><svg viewBox="0 0 720 240" width="100%" style="max-width:720px">';
+    const dayW = Math.min(70, 640 / Math.max(days.length, 1) - 10);
+    x = 60;
+    html += `<line x1="50" y1="200" x2="700" y2="200" stroke="#94a3b8"/>`;
+    html += `<line x1="50" y1="20" x2="50" y2="200" stroke="#94a3b8"/>`;
+    const maxDaily = Math.max(8, ...days.map(d => Object.values(perDayMachine[d] || {}).reduce((s, v) => s + v.molding + v.loading, 0)));
+    for (let p = 0; p <= maxDaily; p += Math.ceil(maxDaily/4)) {
+      const y = 200 - (p/maxDaily)*180;
+      html += `<line x1="45" y1="${y}" x2="50" y2="${y}" stroke="#94a3b8"/>`;
+      html += `<text x="42" y="${y+3}" font-size="9" text-anchor="end" fill="#64748b">${p}h</text>`;
+    }
+    for (const d of days) {
+      let stackY = 200;
+      for (const mk of Object.keys(perDayMachine[d] || {})) {
+        const v = perDayMachine[d][mk];
+        const mh = (v.molding/maxDaily)*180;
+        const lh = (v.loading/maxDaily)*180;
+        if (lh > 0) { html += `<rect x="${x}" y="${stackY-lh}" width="${dayW}" height="${lh}" fill="#fde68a" stroke="#fff" stroke-width="1"/>`; stackY -= lh; }
+        if (mh > 0) { html += `<rect x="${x}" y="${stackY-mh}" width="${dayW}" height="${mh}" fill="#0f3b7a" stroke="#fff" stroke-width="1"/>`; stackY -= mh; }
+      }
+      const isSun = isSunday(d);
+      const sunTxt = isSun ? (isSundayWorking(d) ? ' (W)' : ' (OFF)') : '';
+      html += `<text x="${x+dayW/2}" y="218" font-size="9" text-anchor="middle" fill="${isSun?'#b45309':'#334155'}">${d.slice(5)}${sunTxt}</text>`;
+      x += dayW + 10;
+    }
+    html += '</svg>';
+    html += '<div style="display:flex;gap:14px;font-size:.75rem;margin-top:4px;justify-content:center"><span><span style="display:inline-block;width:12px;height:12px;background:#0f3b7a;border-radius:2px"></span> Molding</span><span><span style="display:inline-block;width:12px;height:12px;background:#fde68a;border-radius:2px"></span> Loading</span></div>';
+    html += '</div>';
+
+    // 4. Line
+    html += '<h3>Cumulative Hours (Line)</h3>';
+    html += '<div class="chart-container"><svg viewBox="0 0 720 200" width="100%" style="max-width:720px">';
+    const dayHours = days.map(d => Object.values(perDayMachine[d] || {}).reduce((s, v) => s + v.molding + v.loading, 0));
+    let cum = 0;
+    const cumArr = dayHours.map(h => (cum += h, cum));
+    const maxCum = Math.max(1, cumArr[cumArr.length-1] || 1);
+    html += `<line x1="50" y1="170" x2="700" y2="170" stroke="#94a3b8"/>`;
+    html += `<line x1="50" y1="20" x2="50" y2="170" stroke="#94a3b8"/>`;
+    const stepX = 640 / Math.max(days.length-1, 1);
+    let pathD = '';
+    cumArr.forEach((v, i) => {
+      const px = 50 + i * stepX;
+      const py = 170 - (v/maxCum)*140;
+      pathD += (i === 0 ? 'M' : 'L') + px + ',' + py + ' ';
+    });
+    html += `<path d="${pathD}" fill="none" stroke="#0f3b7a" stroke-width="2.5"/>`;
+    cumArr.forEach((v, i) => {
+      const px = 50 + i * stepX;
+      const py = 170 - (v/maxCum)*140;
+      html += `<circle cx="${px}" cy="${py}" r="3" fill="#0f3b7a"/>`;
+      html += `<text x="${px}" y="185" font-size="9" text-anchor="middle" fill="#334155">${days[i].slice(5)}</text>`;
+      html += `<text x="${px}" y="${py-8}" font-size="9" text-anchor="middle" fill="#0f3b7a">${v.toFixed(0)}</text>`;
+    });
+    html += '</svg></div>';
+
+    // 5. Item bars
+    html += '<h3>Top Item Contribution (hours)</h3>';
+    html += '<div class="chart-container"><svg viewBox="0 0 600 220" width="100%" style="max-width:600px">';
+    html += `<defs><linearGradient id="gradItem" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#0f3b7a"/></linearGradient></defs>`;
+    const itemKeys = Object.keys(perItem).sort((a,b) => perItem[b]-perItem[a]).slice(0, 8);
+    const maxItem = Math.max(1, ...Object.values(perItem));
+    let yy = 20;
+    for (const k of itemKeys) {
+      const w = (perItem[k]/maxItem)*380;
+      html += `<text x="65" y="${yy+14}" font-size="11" text-anchor="end" fill="#334155">${esc(k)}</text>`;
+      html += `<rect x="70" y="${yy}" width="${w}" height="18" fill="url(#gradItem)" rx="4"/>`;
+      html += `<text x="${75+w}" y="${yy+14}" font-size="11" fill="#0f3b7a" font-weight="600">${perItem[k].toFixed(1)}h</text>`;
+      yy += 24;
+    }
+    html += '</svg></div>';
+
+    // 6. Heatmap
+    html += '<h3>Daily Heatmap</h3>';
+    html += '<div class="chart-container">';
+    html += '<div style="display:grid;grid-template-columns:80px repeat(' + days.length + ',1fr);gap:3px;align-items:center;font-size:.7rem">';
+    html += '<div></div>';
+    for (const d of days) {
+      const isSun = isSunday(d);
+      const color = isSun ? (isSundayWorking(d) ? '#b45309' : '#64748b') : '#1e293b';
+      html += `<div style="text-align:center;font-weight:600;font-size:.65rem;color:${color}">${fmtShort(d)}${isSun?'*':''}</div>`;
+    }
+    for (const mk of Object.keys(perMachine)) {
+      html += `<div style="font-weight:600;text-align:left;font-size:.7rem">${esc(mk)}</div>`;
+      for (const d of days) {
+        const v = perDayMachine[d] && perDayMachine[d][mk] ? perDayMachine[d][mk].molding + perDayMachine[d][mk].loading : 0;
+        const intensity = Math.min(1, v / 24);
+        const bg = v === 0 ? '#f1f5f9' : `rgba(15,59,122,${0.15 + intensity*0.8})`;
+        const fg = intensity > 0.5 ? '#fff' : '#0f172a';
+        html += `<div style="background:${bg};color:${fg};border-radius:5px;padding:4px 2px;text-align:center;font-size:.65rem;font-weight:500">${v.toFixed(1)}</div>`;
+      }
+    }
+    html += '</div><p class="text-muted" style="font-size:.7rem;margin-top:6px">* Sunday — working Sundays shown with amber colour</p></div>';
+
+    // 7. Table
+    html += '<h3>Per-Machine Summary</h3>';
+    html += '<table><thead><tr><th>Machine</th><th>Jobs</th><th>Hours</th><th>Utilisation %</th><th>Idle Hours</th></tr></thead><tbody>';
+    for (const k of machineKeys) {
+      const pct = totalHorizonHours ? (perMachine[k].hours / totalHorizonHours) * 100 : 0;
+      const idle = totalHorizonHours - perMachine[k].hours;
+      html += `<tr><td>${esc(k)}</td><td class="num">${perMachine[k].jobs}</td><td class="num">${perMachine[k].hours.toFixed(1)}</td><td class="num">${pct.toFixed(1)}%</td><td class="num">${idle.toFixed(1)}</td></tr>`;
+    }
+    html += '</tbody></table>';
+
+    c.innerHTML = html;
+  }
+  renderCharts();
+  document.getElementById('exportUtilBtn').onclick = () => {
+    const jobs = getJobs();
+    const days = [];
+    for (let i = 0; i < (state.horizon || 7); i++) days.push(addDays(todayISO(), i));
+    const workingDays = days.filter(d => !isSunday(d) || isSundayWorking(d));
+    const totalHorizonHours = 24 * workingDays.length;
+    const perM = {};
+    for (const m of state.machines.filter(m => m.active)) perM[m.code] = {name: m.name, hours: 0, jobs: 0};
+    for (const j of jobs) {
+      if (!perM[j.machine]) perM[j.machine] = {name: j.machine, hours: 0, jobs: 0};
+      perM[j.machine].hours += j.hours || 0;
+      perM[j.machine].jobs++;
+    }
+    const rows = [['--- PER MACHINE ---'], ['Machine','Name','Jobs','Hours','Util %']];
+    for (const [k, v] of Object.entries(perM)) rows.push([k, v.name, v.jobs, v.hours.toFixed(1), totalHorizonHours ? ((v.hours/totalHorizonHours)*100).toFixed(1) : '0']);
+    rows.push([]); rows.push(['--- ITEM CONTRIBUTION ---']); rows.push(['Item','Hours']);
+    const perItem = {};
+    for (const j of jobs) { if (j.item) perItem[j.item] = (perItem[j.item]||0)+(j.hours||0); }
+    for (const [k, v] of Object.entries(perItem)) rows.push([k, v.toFixed(1)]);
+    exportCSVRaw('Utilisation Export', rows);
+  };
+}
+
+// ============================================================
+// TAB 5 — CTW
+// ============================================================
+function renderCTW(panel) {
+  panel.innerHTML = `
+    <h2>Control Tower <span class="code-badge">CTW</span></h2>
+    <p class="section-desc">Read-only operational snapshot.</p>
+    <div class="btn-group"><button class="btn" id="exportCTBtn">Export Snapshot CSV</button></div>
+    <div id="ctwContent"></div>
+  `;
+  function renderCT() {
+    const c = document.getElementById('ctwContent');
+    if (!c) return;
+    const openSOs = state.orders.length;
+    const releasedMOPs = state.documents.filter(d => d.type === 'MOP' && d.status === 'RELEASED').length;
+    const jobsPlaced = state.placedJobs.length;
+    const blocks = state.materialHolds.length;
+    const activeM = state.machines.filter(m => m.active).length;
+    const totalH = state.placedJobs.reduce((s, j) => s + (j.hours||0), 0);
+    const days = [];
+    for (let i = 0; i < (state.horizon||7); i++) days.push(addDays(todayISO(), i));
+    const workingDays = days.filter(d => !isSunday(d) || isSundayWorking(d));
+    const totalAvail = 24 * workingDays.length * activeM;
+    const avgUtil = totalAvail ? ((totalH/totalAvail)*100).toFixed(1) : '0';
+    let html = '<div class="flex-row" style="gap:10px">';
+    html += `<div class="kpi-tile"><h4>Open SOs</h4><div class="val">${openSOs}</div></div>`;
+    html += `<div class="kpi-tile"><h4>Released MOPs</h4><div class="val">${releasedMOPs}</div></div>`;
+    html += `<div class="kpi-tile"><h4>Jobs Placed</h4><div class="val">${jobsPlaced}</div></div>`;
+    html += `<div class="kpi-tile"><h4>Material Blocks</h4><div class="val">${blocks}</div></div>`;
+    html += `<div class="kpi-tile"><h4>Active Machines</h4><div class="val">${activeM}</div></div>`;
+    html += `<div class="kpi-tile"><h4>Avg Util</h4><div class="val">${avgUtil}%</div></div>`;
+    html += '</div>';
+    html += '<h3>Top Alerts</h3>';
+    const alerts = [];
+    for (const o of state.orders) {
+      const m = getMaterialStatus(o);
+      if (m.status === 'block') alerts.push(`<span class="badge badge-block">BLOCK</span> ${esc(o.so)} — ${esc(o.item)} material shortage`);
+      if (m.status === 'partial') alerts.push(`<span class="badge badge-partial">PARTIAL</span> ${esc(o.so)} — ${esc(o.item)} (${(m.minRatio*100).toFixed(0)}% available)`);
+    }
+    if (jobsPlaced === 0) alerts.push('⚠ No jobs scheduled yet');
+    for (const b of state.breakdowns) alerts.push(`<span class="badge badge-block">BREAKDOWN</span> ${esc(b.machine)} on ${b.date} (${b.hours}h)`);
+    // Sunday warnings
+    const sundays = days.filter(d => isSunday(d));
+    const workingSun = sundays.filter(d => isSundayWorking(d));
+    if (workingSun.length > 0) alerts.push(`<span class="badge badge-working">WORKING SUNDAY</span> ${workingSun.map(d => fmtShort(d)).join(', ')}`);
+    html += alerts.length ? '<ul style="margin-left:18px;font-size:.85rem">' + alerts.slice(0, 10).map(a => '<li>' + a + '</li>').join('') + '</ul>' : '<p class="text-muted">No alerts.</p>';
+    html += '<h3>Machine Status</h3><div class="flex-row">';
+    const today = todayISO();
+    for (const m of state.machines.filter(m => m.active)) {
+      const brk = state.breakdowns.find(b => b.machine === m.code && b.date === today);
+      const jobs = state.placedJobs.filter(j => j.machine === m.code && j.date === today);
+      const sunOff = isSunday(today) && !isSundayWorking(today);
+      const status = sunOff ? 'OFF (Sunday)' : brk ? 'Breakdown' : (jobs.length ? 'Running' : 'Idle');
+      const cls = sunOff ? 'badge-sunday' : brk ? 'badge-block' : (jobs.length ? 'badge-ok' : 'badge-draft');
+      html += `<div class="org-card" style="min-width:180px"><strong>${esc(m.name)}</strong><br><span class="text-muted" style="font-size:.75rem">${esc(m.code)}</span><br><span class="badge ${cls}">${status}</span></div>`;
+    }
+    html += '</div>';
+    html += '<h3>Order Pipeline</h3>';
+    html += `<div class="flex-row" style="gap:10px">
+      <div class="kpi-tile"><h4>SO</h4><div class="val">${state.orders.length}</div></div>
+      <div class="kpi-tile"><h4>MOP</h4><div class="val">${state.documents.filter(d => d.type === 'MOP').length}</div></div>
+      <div class="kpi-tile"><h4>JOB</h4><div class="val">${state.placedJobs.length}</div></div>
+      <div class="kpi-tile"><h4>FIN</h4><div class="val">${state.documents.filter(d => d.type === 'FIN').length}</div></div>
+    </div>`;
+    html += '<h3>Material Watch (Top 5 Shortages)</h3>';
+    const shorts = {};
+    for (const b of state.bom) {
+      const order = state.orders.find(o => o.item === b.parent);
+      if (!order) continue;
+      const net = Math.max(0, order.reqQty - order.lastStock);
+      const req = net * b.perUnit;
+      const s = Math.max(0, req - num(b.available));
+      if (s > 0) shorts[b.child] = (shorts[b.child] || 0) + s;
+    }
+    const topShorts = Object.entries(shorts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    html += topShorts.length ? '<table><thead><tr><th>Material</th><th>Shortage</th></tr></thead><tbody>' + topShorts.map(([k,v]) => `<tr><td>${esc(k)}</td><td class="num" style="color:#dc2626">${v.toFixed(2)}</td></tr>`).join('') + '</tbody></table>' : '<p class="text-muted">No shortages.</p>';
+    c.innerHTML = html;
+  }
+  renderCT();
+  document.getElementById('exportCTBtn').onclick = () => {
+    const rows = [['KPI','Value']];
+    rows.push(['Open SOs', state.orders.length]);
+    rows.push(['Released MOPs', state.documents.filter(d => d.type === 'MOP' && d.status === 'RELEASED').length]);
+    rows.push(['Jobs Placed', state.placedJobs.length]);
+    rows.push(['Material Blocks', state.materialHolds.length]);
+    rows.push(['Active Machines', state.machines.filter(m => m.active).length]);
+    exportCSVRaw('Control Tower Snapshot', rows);
+  };
+}
+
+// ============================================================
+// TAB 6 — DLF
+// ============================================================
+function renderDLF(panel) {
+  panel.innerHTML = `
+    <h2>Deadline Feasibility <span class="code-badge">DLF</span></h2>
+    <p class="section-desc">Read-only feasibility analysis.</p>
+    <div class="btn-group"><button class="btn" id="exportDLFBtn">Export CSV</button></div>
+    <div style="overflow-x:auto;"><table>
+      <thead><tr><th>SO</th><th>Item</th><th>Qty</th><th>Schedule</th><th>Earliest Finish</th><th>Slack (days)</th><th>Verdict</th></tr></thead>
+      <tbody id="dlfBody"></tbody>
+    </table></div>
+  `;
+  function render() {
+    const tb = document.getElementById('dlfBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    for (const o of state.orders) {
+      const item = state.items.find(i => i.material === o.item);
+      const lead = item ? num(item.lead) : 0;
+      const earliest = addDays(todayISO(), lead);
+      const slack = Math.round((new Date(o.scheduleDate) - new Date(earliest)) / 86400000);
+      let v = 'Unknown', b = 'badge-info';
+      if (slack >= 3) { v = 'Comfortable'; b = 'badge-ok'; }
+      else if (slack >= 0) { v = 'Tight'; b = 'badge-partial'; }
+      else { v = 'Impossible'; b = 'badge-impossible'; }
+      tb.innerHTML += `<tr><td>${esc(o.so)}</td><td>${esc(o.item)}</td><td class="num">${Math.max(0,o.reqQty-o.lastStock)}</td><td>${o.scheduleDate}</td><td>${earliest}</td><td class="num">${slack}</td><td><span class="badge ${b}">${v}</span></td></tr>`;
+    }
+  }
+  render();
+  document.getElementById('exportDLFBtn').onclick = () => {
+    const rows = [['SO','Item','Qty','Schedule Date','Earliest Finish','Slack (days)','Verdict']];
+    for (const o of state.orders) {
+      const item = state.items.find(i => i.material === o.item);
+      const lead = item ? num(item.lead) : 0;
+      const earliest = addDays(todayISO(), lead);
+      const slack = Math.round((new Date(o.scheduleDate) - new Date(earliest)) / 86400000);
+      rows.push([o.so, o.item, Math.max(0,o.reqQty-o.lastStock), o.scheduleDate, earliest, slack, slack>=3?'Comfortable':slack>=0?'Tight':'Impossible']);
+    }
+    exportCSVRaw('Deadline Feasibility', rows);
+  };
+}
+
+// ============================================================
+// TAB 7 — SHR
+// ============================================================
+function renderSHR(panel) {
+  panel.innerHTML = `
+    <h2>Shortage Roll-up <span class="code-badge">SHR</span></h2>
+    <p class="section-desc">Aggregated shortages by child material.</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="genReqBtn">Generate Requirement</button>
+      <button class="btn" id="exportSHRBtn">Export CSV</button>
+      <button class="btn" id="exportBuyBtn">Buy Order Draft CSV</button>
+    </div>
+    <div style="overflow-x:auto;"><table>
+      <thead><tr><th>Child</th><th>Total Required</th><th>Total Available</th><th>Net Shortage</th><th>ETA</th><th>Suggested Buy Qty</th><th>Affected SOs</th></tr></thead>
+      <tbody id="shrBody"></tbody>
+    </table></div>
+  `;
+  function computeRollup() {
+    const r = {};
+    for (const o of state.orders) {
+      for (const b of state.bom.filter(b => b.parent === o.item)) {
+        const net = Math.max(0, o.reqQty - o.lastStock);
+        const req = net * b.perUnit;
+        if (!r[b.child]) r[b.child] = {req:0, avail:num(b.available), lead:num(b.lead), orders:[]};
+        r[b.child].req += req;
+        if (!r[b.child].orders.includes(o.so)) r[b.child].orders.push(o.so);
+      }
+    }
+    return r;
+  }
+  function render() {
+    const tb = document.getElementById('shrBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    const r = computeRollup();
+    for (const [child, d] of Object.entries(r)) {
+      const short = Math.max(0, d.req - d.avail);
+      tb.innerHTML += `<tr><td>${esc(child)}</td><td class="num">${d.req.toFixed(2)}</td><td class="num">${d.avail}</td><td class="num" style="color:${short>0?'#dc2626':'#16a34a'}">${short.toFixed(2)}</td><td>${addDays(todayISO(), d.lead)}</td><td class="num">${short>0?Math.ceil(short):0}</td><td>${d.orders.map(esc).join(', ')}</td></tr>`;
+    }
+  }
+  render();
+  document.getElementById('genReqBtn').onclick = () => {
+    pushHistory();
+    const r = computeRollup();
+    let count = 0;
+    for (const [child, d] of Object.entries(r)) {
+      const short = Math.max(0, d.req - d.avail);
+      if (short > 0) { createDoc('REQ', {material: child, qty: Math.ceil(short), status: 'DRAFT'}); count++; }
+    }
+    saveState();
+    alert(`Created ${count} requirement documents.`);
+  };
+  document.getElementById('exportSHRBtn').onclick = () => {
+    const rows = [['Child','Total Required','Total Available','Net Shortage','ETA','Suggested Buy Qty','Affected SOs']];
+    const r = computeRollup();
+    for (const [child, d] of Object.entries(r)) {
+      const short = Math.max(0, d.req - d.avail);
+      rows.push([child, d.req.toFixed(2), d.avail, short.toFixed(2), addDays(todayISO(), d.lead), short>0?Math.ceil(short):0, d.orders.join('; ')]);
+    }
+    exportCSVRaw('Shortage Roll-up', rows);
+  };
+  document.getElementById('exportBuyBtn').onclick = () => {
+    const rows = [['Child','Suggested Buy Qty','ETA']];
+    const r = computeRollup();
+    for (const [child, d] of Object.entries(r)) {
+      const short = Math.max(0, d.req - d.avail);
+      if (short > 0) rows.push([child, Math.ceil(short), addDays(todayISO(), d.lead)]);
+    }
+    exportCSVRaw('Buy Order Draft', rows);
+  };
+}
+
+// ============================================================
+// TAB 8 — SCN
+// ============================================================
+function renderSCN(panel) {
+  panel.innerHTML = `
+    <h2>Scenarios <span class="code-badge">SCN</span></h2>
+    <p class="section-desc">Save, load, and compare state snapshots.</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="saveScenarioBtn">Save Snapshot</button>
+      <button class="btn" id="exportScenBtn">Export CSV</button>
+    </div>
+    <div id="scenarioList" class="mt-16"></div>
+  `;
+  function renderList() {
+    const l = document.getElementById('scenarioList');
+    if (!l) return;
+    if (state.scenarios.length === 0) { l.innerHTML = '<p class="text-muted">No snapshots saved.</p>'; return; }
+    let html = '<table><thead><tr><th>Name</th><th>Created</th><th>KPIs</th><th>Actions</th></tr></thead><tbody>';
+    state.scenarios.forEach((s, i) => {
+      const st = s.state;
+      html += `<tr><td>${esc(s.name)}</td><td>${new Date(s.created).toLocaleString()}</td><td class="text-muted">${st.orders?.length||0} SOs, ${st.placedJobs?.length||0} jobs</td><td>
+        <button class="btn btn-sm" onclick="loadScenario(${i})">Load</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteScenario(${i})">Delete</button>
+      </td></tr>`;
+    });
+    html += '</tbody></table>';
+    l.innerHTML = html;
+  }
+  window.loadScenario = i => {
+    suppressHistory = true;
+    Object.assign(state, JSON.parse(JSON.stringify(state.scenarios[i].state)));
+    suppressHistory = false;
+    saveState();
+    renderAll();
+  };
+  window.deleteScenario = i => { pushHistory(); state.scenarios.splice(i,1); saveState(); renderList(); };
+  renderList();
+  document.getElementById('saveScenarioBtn').onclick = () => {
+    const name = prompt('Snapshot name:', 'Scenario ' + (state.scenarios.length+1));
+    if (!name) return;
+    pushHistory();
+    state.scenarios.push({name, created: new Date().toISOString(), state: JSON.parse(JSON.stringify(state))});
+    saveState();
+    renderList();
+  };
+  document.getElementById('exportScenBtn').onclick = () => {
+    const rows = [['Name','Created','SOs','Jobs']];
+    for (const s of state.scenarios) rows.push([s.name, s.created, s.state.orders?.length||0, s.state.placedJobs?.length||0]);
+    exportCSVRaw('Scenarios Summary', rows);
+  };
+}
+
+// ============================================================
+// TAB 9 — MLB
+// ============================================================
+function renderMLB(panel) {
+  panel.innerHTML = `
+    <h2>Multi-Level BOM <span class="code-badge">MLB</span></h2>
+    <p class="section-desc">Recursive explosion from single-level BOM.</p>
+    <div class="btn-group"><button class="btn" id="exportMLBBtn">Export CSV</button></div>
+    <div id="mlbTree" class="mt-16"></div>
+  `;
+  function build(parent, level, visited) {
+    if (visited.has(parent)) return [];
+    visited.add(parent);
+    let out = [];
+    for (const c of state.bom.filter(b => b.parent === parent)) {
+      out.push({level, parent, child: c.child, perUnit: c.perUnit, available: c.available, lead: c.lead});
+      out = out.concat(build(c.child, level+1, visited));
+    }
+    return out;
+  }
+  function render() {
+    const c = document.getElementById('mlbTree');
+    if (!c) return;
+    let all = [];
+    for (const fg of state.items.filter(i => i.type === 'FG')) all = all.concat(build(fg.material, 0, new Set()));
+    let html = '<table><thead><tr><th>Level</th><th>Parent</th><th>Child</th><th>Per Unit</th><th>Available</th><th>Lead</th></tr></thead><tbody>';
+    for (const l of all) {
+      html += `<tr><td>${l.level}</td><td>${esc(l.parent)}</td><td>${'&nbsp;&nbsp;'.repeat(l.level)}${esc(l.child)}</td><td class="num">${l.perUnit}</td><td class="num">${l.available}</td><td class="num">${l.lead}</td></tr>`;
+    }
+    html += '</tbody></table>';
+    c.innerHTML = html;
+  }
+  render();
+  document.getElementById('exportMLBBtn').onclick = () => {
+    const rows = [['Level','Parent','Child','Per Unit','Available','Lead']];
+    for (const fg of state.items.filter(i => i.type === 'FG')) {
+      const walk = (p, lvl) => {
+        for (const c of state.bom.filter(b => b.parent === p)) {
+          rows.push([lvl, p, c.child, c.perUnit, c.available, c.lead]);
+          walk(c.child, lvl+1);
+        }
+      };
+      walk(fg.material, 0);
+    }
+    exportCSVRaw('Multi-Level BOM', rows);
+  };
+}
+
+// ============================================================
+// TAB 10 — MST
+// ============================================================
+function renderMST(panel) {
+  panel.innerHTML = `
+    <h2>Machine & Item Master <span class="code-badge">MST</span></h2>
+    <p class="section-desc">Edit machines and items directly. Changes auto-save.</p>
+    <h3>Machines</h3>
+    <div class="btn-group"><button class="btn btn-primary" id="addMachineBtn">+ Add Machine</button></div>
+    <table><thead><tr><th>Code</th><th>Name</th><th>Plant</th><th>Active</th><th></th></tr></thead>
+    <tbody id="machineBody"></tbody></table>
+    <h3 class="mt-16">Item Master</h3>
+    <div class="btn-group"><button class="btn btn-primary" id="addItemBtn">+ Add Item</button></div>
+    <div style="overflow-x:auto;"><table>
+      <thead><tr><th>Material</th><th>Description</th><th>Type</th><th>Unit</th><th>Cycle</th><th>Lead</th><th>Safety</th><th>Reorder</th><th>Cost</th><th>Storage</th><th>Inspect</th><th></th></tr></thead>
+      <tbody id="itemBody"></tbody>
+    </table></div>
+  `;
+  function renderM() {
+    const tb = document.getElementById('machineBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    state.machines.forEach((m, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${esc(m.code)}" data-idx="${i}" data-field="code"></td>
+        <td><input value="${esc(m.name)}" data-idx="${i}" data-field="name"></td>
+        <td><select data-idx="${i}" data-field="plant">${state.org.plants.map(p => `<option ${p.code===m.plant?'selected':''}>${esc(p.code)}</option>`).join('')}</select></td>
+        <td><input type="checkbox" ${m.active?'checked':''} data-idx="${i}" data-field="active" style="width:auto"></td>
+        <td><button class="btn btn-sm btn-danger" onclick="delMachine(${i})">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        const i = parseInt(el.dataset.idx); const f = el.dataset.field;
+        pushHistory();
+        state.machines[i][f] = el.type === 'checkbox' ? el.checked : el.value;
+        saveState(); renderM();
+      });
+    });
+  }
+  function renderI() {
+    const tb = document.getElementById('itemBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    state.items.forEach((it, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${esc(it.material)}" data-idx="${i}" data-field="material"></td>
+        <td><input value="${esc(it.desc||'')}" data-idx="${i}" data-field="desc"></td>
+        <td><select data-idx="${i}" data-field="type">${['FG','SFG','RM'].map(t=>`<option ${t===it.type?'selected':''}>${t}</option>`).join('')}</select></td>
+        <td><input value="${esc(it.unit||'')}" data-idx="${i}" data-field="unit" style="width:50px"></td>
+        <td><input type="number" step="0.01" value="${it.cycle||0}" data-idx="${i}" data-field="cycle" style="width:60px"></td>
+        <td><input type="number" value="${it.lead||0}" data-idx="${i}" data-field="lead" style="width:55px"></td>
+        <td><input type="number" value="${it.safety||0}" data-idx="${i}" data-field="safety" style="width:60px"></td>
+        <td><input type="number" value="${it.reorder||0}" data-idx="${i}" data-field="reorder" style="width:60px"></td>
+        <td><input type="number" value="${it.cost||0}" data-idx="${i}" data-field="cost" style="width:60px"></td>
+        <td><select data-idx="${i}" data-field="storage">${state.org.storageLocations.map(s=>`<option ${s.code===it.storage?'selected':''}>${esc(s.code)}</option>`).join('')}</select></td>
+        <td><input type="checkbox" ${it.inspect?'checked':''} data-idx="${i}" data-field="inspect" style="width:auto"></td>
+        <td><button class="btn btn-sm btn-danger" onclick="delItem(${i})">✕</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', () => {
+        const i = parseInt(el.dataset.idx); const f = el.dataset.field;
+        pushHistory();
+        if (['cycle','lead','safety','reorder','cost'].includes(f)) state.items[i][f] = num(el.value);
+        else if (f === 'inspect') state.items[i][f] = el.checked;
+        else state.items[i][f] = el.value;
+        saveState();
+      });
+    });
+  }
+  window.delMachine = i => { pushHistory(); state.machines.splice(i,1); saveState(); renderM(); };
+  window.delItem = i => { pushHistory(); state.items.splice(i,1); saveState(); renderI(); };
+  renderM(); renderI();
+  document.getElementById('addMachineBtn').onclick = () => {
+    pushHistory();
+    state.machines.push({code:'WC-P' + String(state.machines.length+1).padStart(2,'0'), name:'Press-' + String(state.machines.length+1).padStart(2,'0'), plant:'PLT-01', active:true, shifts:3});
+    saveState(); renderM();
+  };
+  document.getElementById('addItemBtn').onclick = () => {
+    pushHistory();
+    state.items.push({material:'NEW-' + (state.items.length+1), desc:'', type:'RM', unit:'kg', cycle:0, lead:2, safety:0, reorder:0, cost:0, storage:'SL-RAW', inspect:false, stock:0});
+    saveState(); renderI();
+  };
+}
+
+// ============================================================
+// TAB 11 — LAB (with real dates + Sunday toggles)
+// ============================================================
+function renderLAB(panel) {
+  panel.innerHTML = `
+    <h2>Drag-Drop Lab <span class="code-badge">LAB</span></h2>
+    <p class="section-desc">Drag a part chip onto a machine cell. Only primary/alternate machines accept it.</p>
+    <div class="lab-container">
+      <div class="lab-left">
+        <h4>Parts to Place</h4>
+        <div id="labParts"></div>
+        <p class="text-muted" style="font-size:.7rem;margin-top:8px">Parts already placed are greyed out.</p>
+      </div>
+      <div class="lab-right">
+        <div class="flex-row mb-8">
+          <label>Zoom: <select id="labZoom"><option value="week">Week (7d)</option><option value="month">Month (30d)</option></select></label>
+          <button class="btn btn-primary btn-sm" id="pushLabBtn">Push to Main Schedule</button>
+          <button class="btn btn-sm btn-danger" id="clearLabBtn">Clear Lab</button>
+        </div>
+        <div id="labSundayPanel" class="sunday-toggle"></div>
+        <div id="labGrid" class="lab-grid-wrap"></div>
+      </div>
+    </div>
+  `;
+  const zoom = document.getElementById('labZoom');
+  zoom.onchange = () => { renderSundayPanel(); renderGrid(); };
+
+  function getZoomDays() {
+    return document.getElementById('labZoom').value === 'month' ? 30 : 7;
+  }
+
+  function getLabDays() {
+    const n = getZoomDays();
+    const days = [];
+    for (let i = 0; i < n; i++) days.push(addDays(todayISO(), i));
+    return days;
+  }
+
+  function renderSundayPanel() {
+    const c = document.getElementById('labSundayPanel');
+    if (!c) return;
+    const days = getLabDays();
+    const sundays = days.filter(d => isSunday(d));
+    if (sundays.length === 0) { c.innerHTML = '<span class="text-muted">No Sundays in this view.</span>'; return; }
+    const weekMap = {};
+    for (const s of sundays) {
+      const wk = getWeekKey(s);
+      if (!weekMap[wk]) weekMap[wk] = [];
+      weekMap[wk].push(s);
+    }
+    let html = '<span style="font-weight:600;color:#78350f;font-size:.85rem">🔧 Working Sundays:</span>';
+    for (const [wk, dates] of Object.entries(weekMap)) {
+      const working = state.offSundays[wk];
+      html += `<label class="${working?'checked':''}"><input type="checkbox" data-week="${wk}" ${working?'checked':''}> ${wk} — ${dates.map(d => fmtShort(d)).join(', ')}</label>`;
+    }
+    c.innerHTML = html;
+    c.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        pushHistory();
+        const wk = cb.dataset.week;
+        if (cb.checked) state.offSundays[wk] = true;
+        else delete state.offSundays[wk];
+        saveState();
+        renderSundayPanel();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderParts() {
+    const c = document.getElementById('labParts');
+    if (!c) return;
+    c.innerHTML = '';
+    for (const o of state.orders) {
+      const placed = state.labPlacements.some(p => p.so === o.so);
+      const chip = document.createElement('div');
+      chip.className = 'part-chip' + (placed ? ' placed' : '');
+      chip.draggable = !placed;
+      chip.dataset.so = o.so;
+      chip.dataset.item = o.item;
+      chip.innerHTML = `<span>${esc(o.item)}<br><small style="color:#64748b">${esc(o.so)}</small></span><span class="badge badge-info">${Math.max(0,o.reqQty-o.lastStock)}</span>`;
+      if (!placed) {
+        chip.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', o.so);
+          e.dataTransfer.effectAllowed = 'move';
+          chip.classList.add('dragging');
+          const g = document.createElement('div');
+          g.className = 'drag-ghost'; g.id = 'dragGhost';
+          g.textContent = o.item + ' → drop on machine';
+          document.body.appendChild(g);
+          e.dataTransfer.setDragImage(g, 0, 0);
+        });
+        chip.addEventListener('dragend', () => {
+          chip.classList.remove('dragging');
+          document.getElementById('dragGhost')?.remove();
+        });
+      }
+      c.appendChild(chip);
+    }
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('labGrid');
+    if (!grid) return;
+    const days = getLabDays();
+    const machines = state.machines.filter(m => m.active);
+    let html = '<div style="display:grid;grid-template-columns:90px repeat(' + days.length + ',minmax(58px,1fr));gap:3px;align-items:start">';
+    html += '<div class="lab-header">Machine</div>';
+    for (const d of days) {
+      const isSun = isSunday(d);
+      const sunOff = isSun && !isSundayWorking(d);
+      const sunWork = isSun && isSundayWorking(d);
+      html += `<div class="lab-header ${isSun?'sunday-header':''}">${fmtShort(d)}<br><span class="dow">${isSun ? (sunOff?'OFF':'WORK') : ''}</span></div>`;
+    }
+    for (const m of machines) {
+      html += `<div class="lab-header" style="text-align:left">${esc(m.code)}<br><span class="dow">${esc(m.name)}</span></div>`;
+      for (const d of days) {
+        const isSun = isSunday(d);
+        const sunOff = isSun && !isSundayWorking(d);
+        const cls = sunOff ? 'lab-cell sunday-off' : (isSun ? 'lab-cell droppable sunday-working' : 'lab-cell droppable');
+        html += `<div class="${cls}" data-machine="${esc(m.code)}" data-date="${d}">`;
+        const placements = state.labPlacements.filter(p => p.machine === m.code && p.date === d);
+        for (const p of placements) {
+          const o = state.orders.find(oo => oo.so === p.so);
+          const isLocked = state.lockedSlots.some(l => l.machine === m.code && l.date === d);
+          html += `<div class="lab-placement ${isLocked?'locked':''}" title="${esc(p.so)}">${esc(o?.item||p.so)}</div>`;
+        }
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+    grid.innerHTML = html;
+    // Drag handlers
+    grid.querySelectorAll('.lab-cell.droppable').forEach(cell => {
+      cell.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        cell.classList.add('dragover');
+      });
+      cell.addEventListener('dragleave', () => cell.classList.remove('dragover'));
+      cell.addEventListener('drop', e => {
+        e.preventDefault();
+        cell.classList.remove('dragover');
+        const so = e.dataTransfer.getData('text/plain');
+        if (!so) return;
+        const order = state.orders.find(o => o.so === so);
+        if (!order) return;
+        const machine = cell.dataset.machine;
+        const date = cell.dataset.date;
+        // Validate: machine must be primary or alternate
+        if (machine !== order.primaryWC && machine !== order.altWC) {
+          cell.classList.add('invalid');
+          setTimeout(() => cell.classList.remove('invalid'), 800);
+          alert(`❌ ${order.item} can only be placed on ${order.primaryWC} or ${order.altWC}.`);
+          return;
+        }
+        // Validate: part already placed
+        if (state.labPlacements.some(p => p.so === so)) {
+          alert('This part is already placed. Clear it from the other cell first.');
+          return;
+        }
+        // Sunday check
+        if (isSunday(date) && !isSundayWorking(date)) {
+          alert('Sunday is OFF. Enable working Sunday checkbox to allow placement.');
+          return;
+        }
+        pushHistory();
+        state.labPlacements.push({so, machine, date, timestamp: new Date().toISOString()});
+        saveState();
+        renderParts();
+        renderGrid();
+      });
+    });
+  }
+
+  renderParts();
+  renderSundayPanel();
+  renderGrid();
+
+  document.getElementById('pushLabBtn').onclick = () => {
+    if (state.labPlacements.length === 0) { alert('No lab placements to push.'); return; }
+    pushHistory();
+    let count = 0;
+    for (const p of state.labPlacements) {
+      const order = state.orders.find(o => o.so === p.so);
+      if (!order) continue;
+      const item = state.items.find(i => i.material === order.item);
+      const qty = Math.max(0, order.reqQty - order.lastStock);
+      const hours = moldingHours(qty, item ? item.cycle : 0);
+      const date = p.date || addDays(todayISO(), 0);
+      const jobNo = createDoc('JOB', {machine: p.machine, date, shift: 0, hours, so: p.so, item: order.item, qty, type: 'locked'});
+      state.lockedSlots.push({jobNo, machine: p.machine, date, shift: 0, hours, so: p.so, item: order.item, qty, moldingHours: hours, loadingHours: 0});
+      count++;
+    }
+    saveState();
+    alert(`✅ Pushed ${count} lab placements as LOCKED jobs. Lab placements preserved.`);
+    renderGrid();
+  };
+
+  document.getElementById('clearLabBtn').onclick = () => {
+    if (!confirm('Clear all lab placements?')) return;
+    pushHistory();
+    state.labPlacements = [];
+    saveState();
+    renderParts();
+    renderGrid();
+  };
+}
+
+// ============================================================
+// TAB 12 — ORG
+// ============================================================
+function renderORG(panel) {
+  panel.innerHTML = `
+    <h2>Org Structure <span class="code-badge">ORG</span></h2>
+    <p class="section-desc">Editable company, plants, storage, work centers.</p>
+    <div class="btn-group"><button class="btn" id="exportOrgBtn">Export CSV</button></div>
+    <h3>Company</h3>
+    <div class="org-card"><input id="orgCompany" value="${esc(state.org.company)}" style="font-weight:600;font-size:1rem;border:1px solid #dbe3ef;border-radius:8px;padding:6px 10px;width:220px"></div>
+    <h3>Plants</h3>
+    <table><thead><tr><th>Code</th><th>Name</th><th>Address</th><th>Active</th><th></th></tr></thead><tbody id="plantBody"></tbody></table>
+    <div class="btn-group"><button class="btn btn-primary" id="addPlantBtn">+ Add Plant</button></div>
+    <h3 class="mt-16">Storage Locations</h3>
+    <table><thead><tr><th>Code</th><th>Name</th><th>Plant</th><th></th></tr></thead><tbody id="slBody"></tbody></table>
+    <div class="btn-group"><button class="btn btn-primary" id="addSLBtn">+ Add Storage</button></div>
+    <h3 class="mt-16">Work Centers</h3>
+    <table><thead><tr><th>Code</th><th>Name</th><th>Plant</th><th>Active</th></tr></thead><tbody id="wcBody"></tbody></table>
+  `;
+  document.getElementById('orgCompany').addEventListener('change', e => {
+    pushHistory(); state.org.company = e.target.value; saveState();
+  });
+  function renderP() {
+    const tb = document.getElementById('plantBody');
+    tb.innerHTML = '';
+    state.org.plants.forEach((p, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${esc(p.code)}" data-idx="${i}" data-field="code"></td>
+        <td><input value="${esc(p.name)}" data-idx="${i}" data-field="name"></td>
+        <td><input value="${esc(p.address||'')}" data-idx="${i}" data-field="address"></td>
+        <td><input type="checkbox" ${p.active?'checked':''} data-idx="${i}" data-field="active" style="width:auto"></td>
+        <td><button class="btn btn-sm btn-danger" onclick="delPlant(${i})">✕</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input').forEach(el => el.addEventListener('change', () => {
+      const i = parseInt(el.dataset.idx), f = el.dataset.field;
+      pushHistory();
+      state.org.plants[i][f] = el.type === 'checkbox' ? el.checked : el.value;
+      saveState();
+    }));
+  }
+  function renderSL() {
+    const tb = document.getElementById('slBody');
+    tb.innerHTML = '';
+    state.org.storageLocations.forEach((s, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${esc(s.code)}" data-idx="${i}" data-field="code"></td>
+        <td><input value="${esc(s.name)}" data-idx="${i}" data-field="name"></td>
+        <td><select data-idx="${i}" data-field="plant">${state.org.plants.map(p => `<option ${p.code===s.plant?'selected':''}>${esc(p.code)}</option>`).join('')}</select></td>
+        <td><button class="btn btn-sm btn-danger" onclick="delSL(${i})">✕</button></td>`;
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll('input, select').forEach(el => el.addEventListener('change', () => {
+      const i = parseInt(el.dataset.idx), f = el.dataset.field;
+      pushHistory(); state.org.storageLocations[i][f] = el.value; saveState();
+    }));
+  }
+  function renderWC() {
+    const tb = document.getElementById('wcBody');
+    tb.innerHTML = '';
+    state.machines.forEach(m => {
+      tb.innerHTML += `<tr><td>${esc(m.code)}</td><td>${esc(m.name)}</td><td>${esc(m.plant)}</td><td><span class="badge ${m.active?'badge-ok':'badge-block'}">${m.active?'Active':'Inactive'}</span></td></tr>`;
+    });
+  }
+  window.delPlant = i => { pushHistory(); state.org.plants.splice(i,1); saveState(); renderP(); renderPlantSelect(); };
+  window.delSL = i => { pushHistory(); state.org.storageLocations.splice(i,1); saveState(); renderSL(); };
+  renderP(); renderSL(); renderWC();
+  document.getElementById('addPlantBtn').onclick = () => {
+    pushHistory();
+    state.org.plants.push({code:'PLT-' + String(state.org.plants.length+1).padStart(2,'0'), name:'Plant ' + String(state.org.plants.length+1).padStart(2,'0'), address:'', active:true});
+    saveState(); renderP(); renderPlantSelect();
+  };
+  document.getElementById('addSLBtn').onclick = () => {
+    pushHistory();
+    state.org.storageLocations.push({code:'SL-NEW' + (state.org.storageLocations.length+1), name:'New Storage', plant: state.currentPlant});
+    saveState(); renderSL();
+  };
+  document.getElementById('exportOrgBtn').onclick = () => {
+    const rows = [['Type','Code','Name','Plant','Active']];
+    for (const p of state.org.plants) rows.push(['Plant', p.code, p.name, '', p.active]);
+    for (const s of state.org.storageLocations) rows.push(['Storage', s.code, s.name, s.plant, '']);
+    for (const m of state.machines) rows.push(['WorkCenter', m.code, m.name, m.plant, m.active]);
+    exportCSVRaw('Org Structure', rows);
+  };
+}
+
+// ============================================================
+// TAB 13 — FLW
+// ============================================================
+function renderFLW(panel) {
+  panel.innerHTML = `
+    <h2>Document Flow <span class="code-badge">FLW</span></h2>
+    <p class="section-desc">Search a doc number to see linked documents tree.</p>
+    <div class="flex-row mb-8">
+      <input type="text" id="flwSearch" placeholder="e.g. SO-2026-0001 or MOP" style="flex:1;padding:10px 14px;border-radius:12px;border:1px solid #dbe3ef;font-size:.9rem">
+      <button class="btn btn-primary" id="flwSearchBtn">Search</button>
+    </div>
+    <div id="flwResult" class="flow-tree mt-16">Type a document number above.</div>
+  `;
+  function search() {
+    const q = document.getElementById('flwSearch').value.trim().toUpperCase();
+    const r = document.getElementById('flwResult');
+    if (!q) { r.innerHTML = '<p class="text-muted">Enter a document number.</p>'; return; }
+    let docs = state.documents.filter(d => d.docNo === q);
+    if (docs.length === 0) docs = state.documents.filter(d => d.docNo.startsWith(q));
+    if (docs.length === 0) { r.innerHTML = '<p class="text-muted">No documents found for "' + esc(q) + '".</p>'; return; }
+    let html = '';
+    for (const d of docs.slice(0, 5)) {
+      html += `<div>📄 <span class="flow-node" onclick="openDocModal('${esc(d.docNo)}')">${esc(d.docNo)}</span> <small style="color:#64748b">(${d.type}, ${d.status})</small>`;
+      if (d.children) {
+        for (const c of d.children) {
+          const cd = state.documents.find(x => x.docNo === c);
+          html += `<div style="margin-left:24px">└─ <span class="flow-node" onclick="openDocModal('${esc(c)}')">${esc(c)}</span> <small style="color:#64748b">${cd ? '(' + cd.type + ')' : ''}</small>`;
+          if (cd && cd.children) {
+            for (const cc of cd.children) html += `<div style="margin-left:24px">└─ <span class="flow-node" onclick="openDocModal('${esc(cc)}')">${esc(cc)}</span></div>`;
+          }
+          html += '</div>';
+        }
+      }
+      html += '</div>';
+    }
+    r.innerHTML = html;
+  }
+  window.openDocModal = docNo => {
+    const d = state.documents.find(x => x.docNo === docNo);
+    if (!d) return alert('Document not found.');
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `<div class="modal-box"><button class="modal-close" onclick="this.parentElement.parentElement.remove()">✕</button><h3>${esc(d.docNo)}</h3><p class="text-muted">${esc(d.type)} — ${esc(d.status)}</p><pre style="font-size:.8rem;white-space:pre-wrap;background:#f8fafc;padding:10px;border-radius:8px;margin-top:10px">${esc(JSON.stringify(d, null, 2))}</pre></div>`;
+    document.body.appendChild(modal);
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  };
+  window.openFlowModal = so => {
+    state.currentTab = 'FLW';
+    saveState();
+    renderAll();
+    setTimeout(() => { const i = document.getElementById('flwSearch'); if (i) { i.value = so; search(); } }, 100);
+  };
+  document.getElementById('flwSearchBtn').onclick = search;
+  document.getElementById('flwSearch').onkeydown = e => { if (e.key === 'Enter') search(); };
+}
+
+// ============================================================
+// TAB 14 — APR
+// ============================================================
+function renderAPR(panel) {
+  panel.innerHTML = `
+    <h2>Approvals Inbox <span class="code-badge">APR</span></h2>
+    <p class="section-desc">Pending approvals for requirements and orders.</p>
+    <div class="btn-group"><button class="btn" id="exportAprBtn">Export CSV</button></div>
+    <div id="aprList"></div>
+  `;
+  function render() {
+    const c = document.getElementById('aprList');
+    if (!c) return;
+    const pending = state.documents.filter(d => d.status === 'DRAFT' && ['REQ','MOP','BRK'].includes(d.type));
+    if (pending.length === 0) { c.innerHTML = '<p class="text-muted">No pending approvals.</p>'; return; }
+    let html = '<table><thead><tr><th>Doc</th><th>Type</th><th>Details</th><th>Actions</th></tr></thead><tbody>';
+    for (const d of pending) {
+      html += `<tr><td>${esc(d.docNo)}</td><td>${esc(d.type)}</td><td>${esc(d.material || d.so || d.machine || '')} ${d.qty || ''}</td><td>
+        <button class="btn btn-sm btn-primary" onclick="approveDoc('${esc(d.docNo)}')">Approve</button>
+        <button class="btn btn-sm btn-danger" onclick="rejectDoc('${esc(d.docNo)}')">Reject</button>
+      </td></tr>`;
+    }
+    html += '</tbody></table>';
+    c.innerHTML = html;
+  }
+  window.approveDoc = docNo => {
+    const d = state.documents.find(x => x.docNo === docNo);
+    if (!d) return;
+    pushHistory();
+    d.status = 'RELEASED';
+    if (d.type === 'REQ') createDoc('BUY', {material: d.material, qty: d.qty, parent: d.docNo, status: 'RELEASED'});
+    addAudit('APPROVE', docNo, 'DRAFT', 'RELEASED', '');
+    saveState();
+    render();
+  };
+  window.rejectDoc = docNo => {
+    const d = state.documents.find(x => x.docNo === docNo);
+    if (!d) return;
+    const reason = prompt('Rejection reason:') || '';
+    pushHistory();
+    d.status = 'CANCELLED';
+    addAudit('REJECT', docNo, 'DRAFT', 'CANCELLED', reason);
+    saveState();
+    render();
+  };
+  render();
+  document.getElementById('exportAprBtn').onclick = () => {
+    const rows = [['Doc','Type','Status','Details']];
+    for (const d of state.documents) rows.push([d.docNo, d.type, d.status, d.material || d.so || d.machine || '']);
+    exportCSVRaw('Approvals Log', rows);
+  };
+}
+
+// ============================================================
+// TAB 15 — LDG
+// ============================================================
+function renderLDG(panel) {
+  panel.innerHTML = `
+    <h2>Material Ledger <span class="code-badge">LDG</span></h2>
+    <p class="section-desc">Stock overview and movement history.</p>
+    <div class="btn-group">
+      <button class="btn" id="exportLedgerBtn">Export CSV</button>
+      <button class="btn btn-primary" id="addMoveBtn">+ Manual Movement</button>
+    </div>
+    <h3>Stock Overview</h3>
+    <table><thead><tr><th>Material</th><th>Plant</th><th>Storage</th><th>Stock</th><th>Unit</th></tr></thead>
+    <tbody id="stockBody"></tbody></table>
+    <h3 class="mt-16">Movement History</h3>
+    <table><thead><tr><th>MOVD No</th><th>Date</th><th>Material</th><th>Qty</th><th>Code</th><th>Dir</th><th>Ref</th><th>User</th></tr></thead>
+    <tbody id="moveBody"></tbody></table>
+  `;
+  function render() {
+    const sb = document.getElementById('stockBody');
+    sb.innerHTML = '';
+    for (const it of state.items) {
+      sb.innerHTML += `<tr><td>${esc(it.material)}</td><td>${esc(state.currentPlant)}</td><td>${esc(it.storage||'')}</td><td class="num">${it.stock||0}</td><td>${esc(it.unit||'')}</td></tr>`;
+    }
+    const mb = document.getElementById('moveBody');
+    mb.innerHTML = '';
+    for (const m of state.movements.slice(-100).reverse()) {
+      mb.innerHTML += `<tr><td>${esc(m.docNo)}</td><td>${m.date.slice(0,10)}</td><td>${esc(m.material)}</td><td class="num">${m.qty}</td><td>${m.code}</td><td>${m.direction}</td><td>${esc(m.refDoc||'')}</td><td>${esc(m.user)}</td></tr>`;
+    }
+  }
+  render();
+  document.getElementById('addMoveBtn').onclick = () => {
+    const material = prompt('Material:');
+    if (!material) return;
+    const qty = parseFloat(prompt('Qty:', '1')) || 0;
+    const code = parseInt(prompt('Movement code (110/210/410/etc):', '110')) || 110;
+    pushHistory();
+    addMovement(material, qty, code, 'MANUAL');
+    const it = state.items.find(i => i.material === material);
+    if (it) {
+      const dir = [110,120,320,410,510,610].includes(code) ? 1 : -1;
+      it.stock = (it.stock || 0) + dir * qty;
+    }
+    saveState();
+    render();
+  };
+  document.getElementById('exportLedgerBtn').onclick = () => {
+    const rows = [['Type','Material','Qty','Code','Date','RefDoc']];
+    for (const m of state.movements) rows.push(['Movement', m.material, m.qty, m.code, m.date, m.refDoc]);
+    exportCSVRaw('Material Ledger', rows);
+  };
+}
+
+// ============================================================
+// TAB 16 — LOG
+// ============================================================
+function renderLOG(panel) {
+  panel.innerHTML = `
+    <h2>Transaction Log <span class="code-badge">LOG</span></h2>
+    <p class="section-desc">Chronological audit trail.</p>
+    <div class="btn-group">
+      <button class="btn" id="exportLogBtn">Export Audit CSV</button>
+      <button class="btn btn-danger" id="clearLogBtn">Clear Log</button>
+    </div>
+    <table><thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Doc</th><th>Before</th><th>After</th><th>Reason</th></tr></thead>
+    <tbody id="logBody"></tbody></table>
+  `;
+  function render() {
+    const tb = document.getElementById('logBody');
+    if (!tb) return;
+    tb.innerHTML = '';
+    for (const l of state.auditLog.slice(-200).reverse()) {
+      tb.innerHTML += `<tr><td>${l.timestamp.slice(0,19)}</td><td>${esc(l.user)}</td><td>${esc(l.action)}</td><td>${esc(l.doc||'')}</td><td>${esc(l.before||'')}</td><td>${esc(l.after||'')}</td><td>${esc(l.reason||'')}</td></tr>`;
+    }
+  }
+  render();
+  document.getElementById('exportLogBtn').onclick = () => {
+    const rows = [['Timestamp','User','Action','Doc','Before','After','Reason']];
+    for (const l of state.auditLog) rows.push([l.timestamp, l.user, l.action, l.doc, l.before, l.after, l.reason]);
+    exportCSVRaw('Transaction Audit Log', rows);
+  };
+  document.getElementById('clearLogBtn').onclick = () => {
+    if (!confirm('Clear audit log?')) return;
+    pushHistory();
+    state.auditLog = [];
+    saveState();
+    render();
+  };
+}
+
+// ============================================================
+// CSV
+// ============================================================
+function exportCSVRaw(name, rows) {
+  const lines = [];
+  lines.push('Created by Mayur');
+  lines.push('Plant: ' + state.currentPlant);
+  lines.push('Export: ' + name);
+  lines.push('Generated: ' + new Date().toISOString());
+  lines.push('Doc Type: MIXED');
+  lines.push('');
+  for (const row of rows) {
+    lines.push(row.map(c => {
+      const s = String(c == null ? '' : c);
+      return s.includes(',') || s.includes('"') ? '"' + s.replace(/"/g,'""') + '"' : s;
+    }).join(','));
+  }
+  const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name.replace(/\s+/g,'_') + '.csv';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ============================================================
+// COMMAND BAR
+// ============================================================
+document.getElementById('commandInput').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const q = e.target.value.trim().toUpperCase();
+  if (!q) return;
+  if (NAV_CODES[q]) { state.currentTab = q; saveState(); renderAll(); e.target.value = ''; return; }
+  if (q.match(/^[A-Z]+-\d{4}-\d{4}$/)) {
+    state.currentTab = 'FLW'; saveState(); renderAll();
+    setTimeout(() => { const i = document.getElementById('flwSearch'); if (i) { i.value = q; document.getElementById('flwSearchBtn').click(); } }, 100);
+    e.target.value = ''; return;
+  }
+  if (q.match(/^[A-Z]+$/)) {
+    const docs = state.documents.filter(d => d.type === q).slice(-20);
+    alert(docs.length ? 'Latest ' + q + ' docs:\n' + docs.map(d => d.docNo).join('\n') : 'No documents of type ' + q);
+    e.target.value = ''; return;
+  }
+  if (q.includes('CREATE') && q.includes('MOP')) {
+    state.currentTab = 'OBK'; saveState(); renderAll();
+    setTimeout(() => document.getElementById('createMOPsBtn')?.click(), 150);
+    e.target.value = ''; return;
+  }
+  alert('Unknown command: ' + q);
+});
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); }
+});
+
+document.getElementById('userSelect').addEventListener('change', e => {
+  state.currentUser = e.target.value;
+  const roles = {Mayur:'ADM', Planner:'PLN', Supervisor:'SUP', Viewer:'VWR'};
+  state.currentRole = roles[state.currentUser] || 'VWR';
+  saveState();
+  renderAll();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  loadState();
+  seedDefaults();
+  if (!state.currentTab) state.currentTab = 'OBK';
+  if (history.stack.length === 0) history.stack = [JSON.parse(JSON.stringify(state))];
+  history.index = 0;
+  renderAll();
+  updateHistoryButtons();
+}
+init();
+</script>
+</body>
+</html>
